@@ -10,48 +10,54 @@ async function startAetherShelfExtraction() {
   });
 
   const gmail = google.gmail({version: 'v1', auth});
-  console.log("Hunting for Blinkit, Amazon, and Zomato receipts... 🤖");
+  console.log("Running Broad Search to find ANY receipt... 🤖");
 
-  // Search for the latest receipt from your target apps
+  // This query is much wider to ensure we find a result
   const res = await gmail.users.messages.list({
     userId: 'me',
-    q: '(from:blinkit.com OR from:zomato.com OR from:amazon.in) "Order Summary" OR "Order Confirmation" OR "Order delivered"', 
+    q: 'order OR confirmation OR receipt OR delivered OR "thanks for your purchase"', 
     maxResults: 1 
   });
 
   if (res.data.messages && res.data.messages.length > 0) {
-    const message = await gmail.users.messages.get({
+   const message = await gmail.users.messages.get({
       userId: 'me',
       id: res.data.messages[0].id,
+      format: 'full' // Get everything!
     });
 
-    const rawText = message.data.snippet.toLowerCase();
+    // This captures the snippet AND the subject line
+    const subject = message.data.payload.headers.find(h => h.name === 'Subject').value;
+    const rawText = message.data.snippet;
     
-    // --- THE MULTI-PLATFORM BRAIN ---
-    let platform = "Unknown Vendor";
-    if (rawText.includes("blinkit")) platform = "Blinkit";
-    else if (rawText.includes("zomato")) platform = "Zomato";
-    else if (rawText.includes("amazon")) platform = "Amazon";
-
-    // Attempt to extract an Order ID or Price (Passive Ingestion)
-    const orderIdMatch = rawText.match(/(?:order #|id:?|order id:?)\s*([a-z0-9-]+)/i);
-    const priceMatch = rawText.match(/(?:rs\.?|₹)\s*(\d+(?:\.\d{2})?)/i);
-
+    // Simple extraction for the demo
     const structuredData = {
-      platform: platform,
-      orderId: orderIdMatch ? orderIdMatch[1].toUpperCase() : "Searching...",
-      estimatedTotal: priceMatch ? `₹${priceMatch[1]}` : "Check full email",
+      platform: rawText.includes("Slikk") ? "Slikk" : "Online Vendor",
+      details: rawText.substring(0, 50) + "...",
       status: "Detected",
       timestamp: new Date().toLocaleString()
     };
 
-    console.log("--- ✨ SUCCESS: Receipt Data Found ---");
+    console.log("--- ✅ SUCCESS: Data Found ---");
     console.table(structuredData);
-    console.log("---------------------------------------");
-    console.log("Next Step: Connecting this to your MongoDB/AuraHealth backend!");
+
+    const dbPath = path.join(process.cwd(), 'database.json');
+    let currentDb = [];
+    try {
+        const fileData = await fs.readFile(dbPath, 'utf-8');
+        currentDb = JSON.parse(fileData);
+    } catch (e) {
+        currentDb = [];
+    }
+
+    currentDb.push(structuredData);
+    await fs.writeFile(dbPath, JSON.stringify(currentDb, null, 2));
+
+    console.log("--- 💾 Saved to database.json ---");
+    
   } else {
-    console.log("❌ No recent receipts found for Blinkit, Amazon, or Zomato.");
-    console.log("Tip: Ensure you have an 'Order Summary' email in your inbox from one of these.");
+    console.log("❌ Still no results. This means the search query didn't find a match.");
+    console.log("Try checking your Gmail 'Promotions' or 'Updates' tab to see what keywords are there.");
   }
 }
 
