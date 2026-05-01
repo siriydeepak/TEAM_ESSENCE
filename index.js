@@ -31,13 +31,21 @@ async function startAetherShelfExtraction() {
     const rawText = message.data.snippet;
     
     // Simple extraction for the demo
+    // --- PARSER LOGIC ---
+    // Extracting actual values from the messy snippet
+    const orderIdMatch = rawText.match(/(?:Order #|ID:|Order ID:)\s*([A-Z0-9-]+)/i);
+    const priceMatch = rawText.match(/(?:₹|Rs\.?)\s*(\d+(?:\.\d{2})?)/i);
+
     const structuredData = {
-      platform: rawText.includes("Slikk") ? "Slikk" : "Online Vendor",
-      details: rawText.substring(0, 50) + "...",
-      status: "Detected",
+      platform: rawText.toLowerCase().includes("slikk") ? "Slikk" : 
+                rawText.toLowerCase().includes("blinkit") ? "Blinkit" : 
+                rawText.toLowerCase().includes("amazon") ? "Amazon" : "Zomato",
+      orderId: orderIdMatch ? orderIdMatch[1].toUpperCase() : "PENDING-" + Date.now(),
+      total: priceMatch ? `₹${priceMatch[1]}` : "N/A",
+      details: rawText.substring(0, 100).replace(/&#39;/g, "'") + "...", 
+      status: "Parsed",
       timestamp: new Date().toLocaleString()
     };
-
     console.log("--- ✅ SUCCESS: Data Found ---");
     console.table(structuredData);
 
