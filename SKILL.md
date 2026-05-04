@@ -1,18 +1,20 @@
-﻿# Email Parser Skill
+# Pantry Intel Skill
 
-I parse grocery receipt emails and add items to the pantry ledger.
+## Schema
 
-## Capabilities
-- **Receipt Parsing**: Convert receipt text into pantry item updates.
-- **Inventory Updates**: Add parsed items to `pantry_ledger.yaml`.
-- **Collision Alerts**: Surface conflicts when an item already exists in the pantry.
+This skill provides core intelligence for the AetherShelf autonomous agent, exposing three primary tools:
 
-## Trigger Phrases
-- "New receipt received"
-- "Parse my grocery email"
+### 1. update_inventory
+- **Description**: Ingests OCR/email parsed data and safely updates the `pantry_ledger.yaml`.
+- **Inputs**: `item_name` (string), `quantity` (integer), `expiry_date` (string, optional).
+- **Outputs**: Success status and any collision warnings.
 
-## Execution
-This skill runs the receipt parser and updates the pantry ledger via `ledger_handler.py`.
+### 2. predict_depletion
+- **Description**: The core Autonomous Flux logic. Triggered automatically by the `file_watcher` when the ledger changes. Analyzes current stock and consumption flux to find "Utility Gaps."
+- **Inputs**: `ledger_path` (string, optional).
+- **Outputs**: Proactive `notify_user` alerts if items deplete in < 3 days.
 
-## Response_Template
-`🚨 COLLISION: You already have {{item}} expiring on {{date}}. Confirm purchase?`
+### 3. generate_shopping_list
+- **Description**: Compiles a comprehensive list of depleted or soon-to-be depleted items.
+- **Inputs**: None.
+- **Outputs**: Formatted shopping list array.
