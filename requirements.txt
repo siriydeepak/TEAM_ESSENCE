@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+pydantic
+pyyaml
+plotly
+pywebpush
+cryptography
+aiofiles
