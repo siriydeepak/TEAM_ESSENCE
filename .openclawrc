@@ -1,0 +1,4 @@
+skills:
+- EmailParser.skill
+- FluxAlgorithm.skill
+- UtilityGapFinder.skill
