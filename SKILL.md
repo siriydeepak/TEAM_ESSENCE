@@ -1,10 +1,18 @@
-# Collision Detection Skill
+﻿# Email Parser Skill
 
-## Function
-Acts as the "Anti-Waste" Guard. Triggered when a new email is parsed.
+I parse grocery receipt emails and add items to the pantry ledger.
 
-## Logic
-Before you buy, the agent checks `pantry_ledger.yaml`. If you buy Milk but already have 1.5L, it sends a Telegram/WhatsApp alert using the OpenClaw `notify_user` protocol.
+## Capabilities
+- **Receipt Parsing**: Convert receipt text into pantry item updates.
+- **Inventory Updates**: Add parsed items to `pantry_ledger.yaml`.
+- **Collision Alerts**: Surface conflicts when an item already exists in the pantry.
 
-## Output
-"Collision detected! You already have {item} that expires in {time}. Do you really need to buy more?"
+## Trigger Phrases
+- "New receipt received"
+- "Parse my grocery email"
+
+## Execution
+This skill runs the receipt parser and updates the pantry ledger via `ledger_handler.py`.
+
+## Response_Template
+`🚨 COLLISION: You already have {{item}} expiring on {{date}}. Confirm purchase?`
