@@ -1,20 +1,17 @@
-# Pantry Intel Skill
+# Utility Gap Finder Skill
 
-## Schema
+I analyze expiring pantry items and suggest a low-cost, high-value ingredient to maximize usage.
 
-This skill provides core intelligence for the AetherShelf autonomous agent, exposing three primary tools:
+## Capabilities
+- **Expiry Detection**: Scan pantry inventory for items expiring in less than 48 hours.
+- **Meal Suggestion**: Ask Gemini to propose one ingredient under $2 for a high-value meal.
+- **Proactive Alerts**: Generate push-style suggestions for urgent food rescue.
 
-### 1. update_inventory
-- **Description**: Ingests OCR/email parsed data and safely updates the `pantry_ledger.yaml`.
-- **Inputs**: `item_name` (string), `quantity` (integer), `expiry_date` (string, optional).
-- **Outputs**: Success status and any collision warnings.
+## Execution
+This skill calls `gap_finder.py` to inspect `pantry_ledger.yaml` and produce a proactive suggestion.
 
-### 2. predict_depletion
-- **Description**: The core Autonomous Flux logic. Triggered automatically by the `file_watcher` when the ledger changes. Analyzes current stock and consumption flux to find "Utility Gaps."
-- **Inputs**: `ledger_path` (string, optional).
-- **Outputs**: Proactive `notify_user` alerts if items deplete in < 3 days.
+## Priority
+Urgent
 
-### 3. generate_shopping_list
-- **Description**: Compiles a comprehensive list of depleted or soon-to-be depleted items.
-- **Inputs**: None.
-- **Outputs**: Formatted shopping list array.
+## Response_Template
+`Proactive Suggestion: {{suggestion}}`
