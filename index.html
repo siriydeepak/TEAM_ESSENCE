@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#6366f1"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Sentinel"/>
+<meta name="description" content="AetherShelf Sentinel — Autonomous Pantry Intelligence. Works fully offline."/>
+<title>AetherShelf Sentinel</title>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0a0f1e;--card:#111827;--border:#1f2937;
+  --indigo:#6366f1;--violet:#8b5cf6;--cyan:#06b6d4;
+  --green:#22c55e;--red:#ef4444;--amber:#f59e0b;
+  --text:#f1f5f9;--muted:#9ca3af
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--bg);color:var(--text);min-height:100vh;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)
+}
+
+/* ── Layout ─────────────────────────────────── */
+.wrap{width:100%;max-width:1280px;margin:0 auto;padding:16px}
+
+/* Desktop: 2-column grid */
+@media(min-width:768px){
+  .wrap{padding:24px 32px}
+  .desktop-grid{
+    display:grid;
+    grid-template-columns:320px 1fr;
+    gap:20px;
+    align-items:start;
+  }
+  .desktop-main{display:flex;flex-direction:column;gap:16px}
+  .desktop-sidebar{display:flex;flex-direction:column;gap:16px}
+}
+@media(max-width:767px){
+  .desktop-grid{display:flex;flex-direction:column;gap:0}
+  .desktop-main,.desktop-sidebar{width:100%}
+}
+
+/* ── Components ─────────────────────────────── */
+h1{font-size:clamp(18px,3vw,28px);font-weight:900;background:linear-gradient(135deg,var(--indigo),var(--violet),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sub{font-size:11px;color:var(--muted);font-family:monospace;margin-top:2px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px}
+@media(min-width:768px){.card{margin-bottom:0}}
+.row{display:flex;align-items:center;justify-content:space-between}
+.label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:8px}
+.dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.dot.green{background:var(--green);box-shadow:0 0 8px var(--green)}
+.dot.red{background:var(--red);box-shadow:0 0 8px var(--red)}
+.dot.amber{background:var(--amber)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.live{animation:pulse 2s infinite}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;gap:4px}
+.badge.green{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.badge.red{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.badge.indigo{background:rgba(99,102,241,.12);color:#a5b4fc;border:1px solid rgba(99,102,241,.3)}
+.badge.amber{background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.3)}
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;border-radius:10px;font-weight:700;font-size:13px;padding:10px 16px;cursor:pointer;border:none;outline:none;transition:transform .15s,opacity .15s;-webkit-user-select:none;user-select:none;width:100%}
+.btn:active{transform:scale(.96);opacity:.85}
+.btn.primary{background:linear-gradient(135deg,var(--indigo),var(--violet));color:#fff}
+.btn.ghost{background:rgba(99,102,241,.1);color:#a5b4fc;border:1px solid rgba(99,102,241,.25)}
+.btn.cyan{background:linear-gradient(135deg,#0891b2,var(--cyan));color:#fff}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* Bar chart */
+canvas{display:block;width:100%;border-radius:8px}
+/* Table */
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:6px 8px;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border)}
+td{padding:8px;border-bottom:1px solid rgba(31,41,55,.6)}
+.status-ok{color:var(--green);font-weight:700}
+.status-low{color:var(--amber);font-weight:700}
+.status-critical{color:var(--red);font-weight:700}
+/* Log terminal */
+.log{background:#000;border:1px solid var(--border);border-radius:10px;padding:10px;font-family:monospace;font-size:10px;color:#4ade80;height:200px;overflow-y:auto;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+@media(min-width:768px){.log{height:260px}}
+.log::-webkit-scrollbar{width:3px}.log::-webkit-scrollbar-thumb{background:#374151;border-radius:2px}
+/* Alert */
+.alert{border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:12px;border:1px solid}
+.alert.critical{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.4)}
+.alert.low{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.4)}
+/* Offline banner */
+.offline-bar{background:rgba(245,158,11,.15);border:1px solid var(--amber);border-radius:10px;padding:8px 12px;font-size:12px;color:var(--amber);text-align:center;margin-bottom:12px;display:none}
+/* Entropy bar */
+.ebar-track{background:var(--border);border-radius:999px;height:7px;overflow:hidden;margin-top:6px}
+.ebar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--red),var(--amber),var(--green));transition:width .6s ease}
+/* install banner */
+.install-bar{position:fixed;bottom:0;left:0;right:0;padding:12px;padding-bottom:calc(12px + env(safe-area-inset-bottom));background:rgba(10,15,30,.95);backdrop-filter:blur(12px);border-top:1px solid var(--border);display:none;z-index:99}
+.install-bar.show{display:block}
+@keyframes slidein{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.install-bar.show{animation:slidein .3s ease}
+/* Desktop header */
+.header-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.header-actions{display:flex;gap:8px;flex-wrap:wrap}
+.header-actions .btn{width:auto;padding:8px 14px;font-size:12px}
+/* Stats strip (desktop) */
+.stats-strip{display:none}
+@media(min-width:768px){
+  .stats-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+  .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+  .stat-card .stat-val{font-size:22px;font-weight:900;font-family:monospace}
+  .stat-card .stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+  #mobileActions{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Offline notice -->
+  <div class="offline-bar" id="offlineBar">📡 Offline — showing last cached data</div>
+
+  <!-- Header -->
+  <div class="header-bar">
+    <div>
+      <h1>AetherShelf Sentinel</h1>
+      <div class="sub">OpenClaw Brain · Bengaluru Node</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <!-- Status -->
+      <div class="row" style="gap:6px">
+        <div class="dot red" id="statusDot"></div>
+        <span style="font-size:11px;font-weight:700;color:var(--red)" id="statusTxt">OFFLINE</span>
+      </div>
+      <!-- Desktop action buttons -->
+      <div class="header-actions">
+        <button class="btn primary" onclick="triggerDemo()">⚡ Run Agent Loop</button>
+        <button class="btn cyan" onclick="refresh()">🔄 Refresh</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Entropy strip -->
+  <div style="margin-bottom:16px">
+    <div class="row"><span style="font-size:11px;color:var(--muted);font-family:monospace">PANTRY ENTROPY</span><span style="font-size:11px;font-family:monospace" id="entropyLbl">—</span></div>
+    <div class="ebar-track"><div class="ebar-fill" id="entropyBar" style="width:0%"></div></div>
+  </div>
+
+  <!-- Desktop stats strip -->
+  <div class="stats-strip">
+    <div class="stat-card">
+      <div class="stat-val" id="statItems" style="color:var(--indigo)">—</div>
+      <div class="stat-lbl">Pantry Items</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="statEntropy" style="color:var(--cyan)">—</div>
+      <div class="stat-lbl">Avg Freshness</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="statAlerts" style="color:var(--amber)">—</div>
+      <div class="stat-lbl">Active Alerts</div>
+    </div>
+  </div>
+
+  <!-- Desktop grid layout -->
+  <div class="desktop-grid">
+
+    <!-- Sidebar -->
+    <div class="desktop-sidebar">
+
+      <!-- Push controls -->
+      <div class="card">
+        <div class="label">🔔 Push Notifications</div>
+        <div class="grid2" style="margin-bottom:8px">
+          <button class="btn primary" id="subBtn" onclick="subscribePush()">🔔 Enable Alerts</button>
+          <button class="btn ghost" onclick="testPush()">⚡ Test Push</button>
+        </div>
+        <div id="pushMsg" style="font-size:11px;color:var(--muted);text-align:center;min-height:16px"></div>
+      </div>
+
+      <!-- Alerts -->
+      <div id="alertsBox" style="display:none">
+        <div class="label">🚨 Agent Alerts</div>
+        <div id="alertsList"></div>
+      </div>
+
+      <!-- Ledger -->
+      <div class="card">
+        <div class="row" style="margin-bottom:10px">
+          <div><div style="font-size:13px;font-weight:700">Live Pantry Ledger</div><div class="sub">pantry_ledger.yaml</div></div>
+          <span class="badge indigo" id="itemCountBadge">0 items</span>
+        </div>
+        <table>
+          <thead><tr><th>Item</th><th>Qty</th><th>Days</th></tr></thead>
+          <tbody id="ledgerBody"><tr><td colspan="3" style="text-align:center;padding:20px;color:#4b5563">Connecting…</td></tr></tbody>
+        </table>
+      </div>
+
+      <!-- Mobile-only action buttons -->
+      <div class="grid2" style="margin-bottom:8px" id="mobileActions">
+        <button class="btn primary" onclick="triggerDemo()">⚡ Run Agent Loop</button>
+        <button class="btn cyan" onclick="refresh()">🔄 Refresh</button>
+      </div>
+
+    </div><!-- /sidebar -->
+
+    <!-- Main -->
+    <div class="desktop-main">
+
+      <!-- Chart -->
+      <div class="card">
+        <div class="row" style="margin-bottom:10px">
+          <div><div style="font-size:13px;font-weight:700">Entropy Flux Curve</div><div class="sub">FluxAlgorithm.skill</div></div>
+          <span class="badge green live">● LIVE</span>
+        </div>
+        <canvas id="chart" height="160"></canvas>
+      </div>
+
+      <!-- Agent log -->
+      <div class="card">
+        <div class="row" style="margin-bottom:8px">
+          <div><div style="font-size:13px;font-weight:700">Agent Chain-of-Thought</div><div class="sub">openclaw_session.log</div></div>
+          <span class="badge green">STREAMING</span>
+        </div>
+        <div class="log" id="logBox">Awaiting OpenClaw brain…</div>
+      </div>
+
+    </div><!-- /main -->
+
+  </div><!-- /desktop-grid -->
+
+  <div style="text-align:center;font-size:10px;color:var(--border);font-family:monospace;padding:12px 0">AetherShelf · OpenClaw · PWA v3 · Offline-First</div>
+</div>
+
+<!-- Install banner -->
+<div class="install-bar" id="installBar">
+  <div class="row" style="gap:10px">
+    <span style="font-size:24px">📱</span>
+    <div style="flex:1"><div style="font-weight:700;font-size:13px">Install Sentinel App</div><div style="font-size:11px;color:var(--muted)">No browser bar · Works offline</div></div>
+    <button class="btn primary" id="installBtn" style="padding:8px 14px;font-size:12px">Install</button>
+    <button onclick="document.getElementById('installBar').classList.remove('show')" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer">✕</button>
+  </div>
+</div>
+
+<script>
+// ── OFFLINE-FIRST CONFIG ─────────────────────────────────────
+// API always points to same origin — works on localhost AND via Pinggy tunnel
+// because api_bridge.py serves this file from /pwa and all /api/* routes.
+const DEMO_DATA = {
+  status: "demo",
+  entropy_score: 11.5,
+  ledger: [
+    { name: "Apples",               quantity: 2,   days: 8,  status: "ok"       },
+    { name: "Milk Blinkit",         quantity: 1,   days: 3,  status: "low"      },
+    { name: "Spinach Zepto",        quantity: 500, days: 5,  status: "low"      },
+    { name: "Dry Bread GroceryHub", quantity: 2,   days: 30, status: "ok"       },
+  ],
+  alerts: [
+    { type: "low",  message: "⚠️ Milk Blinkit expires in 3 days. Schedule restock." },
+    { type: "low",  message: "⚠️ Spinach Zepto expires in 5 days." },
+  ],
+  logs: "[OpenClaw] Running in offline/demo mode.\n[OpenClaw] FluxAlgorithm.skill → Pantry Entropy = 11.5 days\n[OpenClaw] UtilityGapFinder.skill → Spinach + Milk → 'Creamed Spinach' recipe unlocked\n[OpenClaw] CollisionDetection.skill → No buy-collision detected\n[OpenClaw] Awaiting live backend connection..."
+};
+
+// Always use same-origin — works on localhost:8000 AND pinggy tunnel URL
+const API = "";
+
+// ── SERVICE WORKER ──────────────────────────────────────────
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js", { scope: "/" })
+    .then(r => console.log("[Sentinel] SW registered:", r.scope))
+    .catch(e => console.warn("[Sentinel] SW failed:", e));
+}
+
+// ── INSTALL PROMPT ──────────────────────────────────────────
+let deferred = null;
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault(); deferred = e;
+  document.getElementById("installBar").classList.add("show");
+});
+document.getElementById("installBtn").onclick = async () => {
+  if (!deferred) return;
+  deferred.prompt();
+  await deferred.userChoice;
+  deferred = null;
+  document.getElementById("installBar").classList.remove("show");
+};
+window.addEventListener("appinstalled", () => document.getElementById("installBar").classList.remove("show"));
+
+// ── NETWORK STATE ───────────────────────────────────────────
+window.addEventListener("online",  () => { refresh(); hideOffline(); });
+window.addEventListener("offline", () => { showOffline(); loadFromCache(); });
+
+function showOffline() { document.getElementById("offlineBar").style.display = "block"; }
+function hideOffline() { document.getElementById("offlineBar").style.display = "none"; }
+
+// ── DATA FETCH (online-first, cache-fallback) ───────────────
+async function fetchState() {
+  const url = API + "/api/state";
+  const res = await fetch(url, { signal: AbortSignal.timeout(4000) });
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  return res.json();
+}
+
+async function refresh() {
+  try {
+    const data = await fetchState();
+    localStorage.setItem("sentinel_cache", JSON.stringify(data));
+    localStorage.setItem("sentinel_ts", Date.now());
+    hideOffline();
+    render(data, true);
+  } catch {
+    loadFromCache();
+  }
+}
+
+function loadFromCache() {
+  const raw = localStorage.getItem("sentinel_cache");
+  if (raw) {
+    try { render(JSON.parse(raw), false); showOffline(); return; }
+    catch {}
+  }
+  render(DEMO_DATA, false);
+  showOffline();
+}
+
+// ── RENDER ──────────────────────────────────────────────────
+function render(data, online) {
+  // Status dot
+  const dot = document.getElementById("statusDot");
+  const txt = document.getElementById("statusTxt");
+  if (online && data.status === "active") {
+    dot.className = "dot green live"; txt.textContent = "LIVE"; txt.style.color = "var(--green)";
+  } else {
+    dot.className = "dot amber"; txt.textContent = online ? "DEMO" : "CACHED"; txt.style.color = "var(--amber)";
+  }
+
+  // Entropy
+  const score = data.entropy_score || 0;
+  document.getElementById("entropyLbl").textContent = score.toFixed(1) + " days avg";
+  document.getElementById("entropyBar").style.width = Math.min((score / 30) * 100, 100) + "%";
+
+  // Ledger
+  const rows = data.ledger || [];
+  document.getElementById("itemCountBadge").textContent = rows.length + " items";
+  // Update stats strip
+  const si = document.getElementById("statItems");
+  const se = document.getElementById("statEntropy");
+  const sa = document.getElementById("statAlerts");
+  if(si) si.textContent = rows.length;
+  if(se) se.textContent = (data.entropy_score||0).toFixed(1)+"d";
+  if(sa) sa.textContent = (data.alerts||[]).length;
+  document.getElementById("ledgerBody").innerHTML = rows.length
+    ? rows.map(r => {
+        const cls = r.status === "critical" ? "status-critical" : r.status === "low" ? "status-low" : "status-ok";
+        const icon = r.days <= 1 ? "🔴" : r.days <= 3 ? "🟡" : "🟢";
+        return `<tr><td>${icon} ${r.name}</td><td style="font-family:monospace;color:var(--muted)">${r.quantity}</td><td class="${cls}" style="font-family:monospace">${r.days}d</td></tr>`;
+      }).join("")
+    : `<tr><td colspan="3" style="text-align:center;padding:16px;color:var(--muted)">No items</td></tr>`;
+
+  // Alerts
+  const alerts = data.alerts || [];
+  const ab = document.getElementById("alertsBox");
+  ab.style.display = alerts.length ? "block" : "none";
+  document.getElementById("alertsList").innerHTML = alerts.map(a =>
+    `<div class="alert ${a.type}">${a.message}</div>`).join("");
+
+  // Log
+  const log = document.getElementById("logBox");
+  if (data.logs) {
+    log.textContent = data.logs;
+    if (Math.abs(log.scrollHeight - log.scrollTop - log.clientHeight) < 60) log.scrollTop = log.scrollHeight;
+  }
+
+  // Chart
+  drawChart(rows);
+}
+
+// ── CANVAS CHART (no external deps) ────────────────────────
+function drawChart(items) {
+  const canvas = document.getElementById("chart");
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth || 340;
+  const H = 160;
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width  = W + "px";
+  canvas.style.height = H + "px";
+
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, W, H);
+
+  const days = 8;
+  const PAD = { l: 32, r: 10, t: 10, b: 28 };
+  const cW = W - PAD.l - PAD.r;
+  const cH = H - PAD.t - PAD.b;
+
+  const maxY = Math.max(30, ...items.map(i => i.days + 2));
+
+  // Grid lines
+  ctx.strokeStyle = "#1f2937"; ctx.lineWidth = 1;
+  [0, 0.25, 0.5, 0.75, 1].forEach(f => {
+    const y = PAD.t + cH * (1 - f);
+    ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(PAD.l + cW, y); ctx.stroke();
+    ctx.fillStyle = "#4b5563"; ctx.font = "9px monospace"; ctx.textAlign = "right";
+    ctx.fillText(Math.round(f * maxY), PAD.l - 4, y + 3);
+  });
+
+  // Critical zone (0-2 days)
+  const critY = PAD.t + cH * (1 - 2 / maxY);
+  ctx.fillStyle = "rgba(239,68,68,.07)";
+  ctx.fillRect(PAD.l, critY, cW, H - PAD.b - critY);
+  ctx.strokeStyle = "rgba(239,68,68,.4)"; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(PAD.l, critY); ctx.lineTo(PAD.l + cW, critY); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // X axis labels
+  ctx.fillStyle = "#6b7280"; ctx.font = "9px monospace"; ctx.textAlign = "center";
+  const today = new Date();
+  for (let i = 0; i < days; i++) {
+    const d = new Date(today); d.setDate(d.getDate() + i);
+    const x = PAD.l + (i / (days - 1)) * cW;
+    ctx.fillText(`${d.getMonth()+1}/${d.getDate()}`, x, H - 6);
+  }
+
+  // Colors
+  const COLORS = ["#6366f1","#06b6d4","#22c55e","#f59e0b","#ec4899","#8b5cf6"];
+
+  // Lines
+  items.filter(it => it.quantity > 0).forEach((item, idx) => {
+    const col = COLORS[idx % COLORS.length];
+    const pts = Array.from({length: days}, (_, i) => ({
+      x: PAD.l + (i / (days - 1)) * cW,
+      y: PAD.t + cH * (1 - Math.max(0, item.days - i) / maxY)
+    }));
+
+    // Line
+    ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.beginPath();
+    pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+    ctx.stroke();
+
+    // Dots
+    ctx.fillStyle = col;
+    pts.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2); ctx.fill(); });
+  });
+
+  // Legend
+  const legendItems = items.filter(it => it.quantity > 0);
+  ctx.font = "9px monospace"; ctx.textAlign = "left";
+  legendItems.slice(0, 4).forEach((item, idx) => {
+    const col = COLORS[idx % COLORS.length];
+    const lx = PAD.l + idx * (cW / Math.max(legendItems.length, 1));
+    ctx.fillStyle = col;
+    ctx.fillRect(lx, PAD.t - 8, 8, 8);
+    ctx.fillStyle = "#9ca3af";
+    const shortName = item.name.length > 10 ? item.name.slice(0, 9) + "…" : item.name;
+    ctx.fillText(shortName, lx + 10, PAD.t - 1);
+  });
+}
+
+// ── PUSH NOTIFICATIONS ──────────────────────────────────────
+function urlB64ToUint8(b) {
+  const p = "=".repeat((4 - b.length % 4) % 4);
+  const s = atob((b + p).replace(/-/g,"+").replace(/_/g,"/"));
+  return Uint8Array.from(s, c => c.charCodeAt(0));
+}
+
+async function subscribePush() {
+  const btn = document.getElementById("subBtn");
+  if (!("PushManager" in window)) { setMsg("❌ Push not supported on this browser."); return; }
+  btn.disabled = true; btn.textContent = "⏳ Registering…";
+  try {
+    const perm = await Notification.requestPermission();
+    if (perm !== "granted") { setMsg("❌ Permission denied."); btn.disabled = false; btn.textContent = "🔔 Enable Alerts"; return; }
+
+    let vapidKey = "";
+    try {
+      const kr = await fetch(API + "/api/push/vapid-public-key", { signal: AbortSignal.timeout(3000) });
+      vapidKey = (await kr.json()).vapid_public_key || "";
+    } catch { setMsg("⚠️ Backend offline — notification storage skipped."); btn.disabled = false; btn.textContent = "🔔 Enable Alerts"; return; }
+
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8(vapidKey) });
+    const sj = sub.toJSON();
+    await fetch(API + "/api/push/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ endpoint: sj.endpoint, keys: sj.keys }) });
+
+    setMsg("✅ Push alerts active!"); btn.textContent = "✅ Alerts Active"; btn.style.background = "linear-gradient(135deg,#166534,#15803d)";
+  } catch (e) { setMsg("❌ " + e.message); btn.disabled = false; btn.textContent = "🔔 Enable Alerts"; }
+}
+
+async function testPush() {
+  try {
+    const r = await fetch(API + "/api/push/test", { method: "POST", signal: AbortSignal.timeout(3000) });
+    const d = await r.json(); setMsg("📡 Test push → " + d.subscribers + " subscriber(s).");
+  } catch { setMsg("⚠️ Backend offline — can't send test push."); }
+}
+
+function setMsg(m) { document.getElementById("pushMsg").textContent = m; }
+
+async function triggerDemo() {
+  try {
+    await fetch(API + "/api/trigger-demo", { method: "POST", signal: AbortSignal.timeout(3000) });
+    setMsg("⚡ Agent loop triggered!"); setTimeout(refresh, 1500);
+  } catch { setMsg("⚠️ Backend offline."); }
+}
+
+// ── BOOT ────────────────────────────────────────────────────
+(async function boot() {
+  // Load cached data instantly (no flash of empty state)
+  const cached = localStorage.getItem("sentinel_cache");
+  if (cached) { try { render(JSON.parse(cached), false); } catch {} }
+  else { render(DEMO_DATA, false); }
+
+  // Then try live fetch
+  await refresh();
+
+  // Poll every 5s when online
+  setInterval(() => { if (navigator.onLine) refresh(); }, 5000);
+
+  // Handle back-from-background page visibility
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && navigator.onLine) refresh(); });
+})();
+</script>
+</body>
+</html>
