@@ -1,0 +1,354 @@
+- date: '2026-04-03'
+  events:
+  - item: Milk
+    consumed_qty: 2
+    remaining_qty: 5
+  - item: Apples
+    consumed_qty: 2
+    remaining_qty: 1
+  - item: Coffee Beans
+    consumed_qty: 2
+    remaining_qty: 1
+- date: '2026-04-04'
+  events:
+  - item: Milk
+    consumed_qty: 2
+    remaining_qty: 4
+  - item: Spinach
+    consumed_qty: 2
+    remaining_qty: 4
+  - item: Coffee Beans
+    consumed_qty: 2
+    remaining_qty: 2
+- date: '2026-04-05'
+  events:
+  - item: Milk
+    consumed_qty: 1
+    remaining_qty: 1
+  - item: Spinach
+    consumed_qty: 2
+    remaining_qty: 3
+  - item: Dry Bread
+    consumed_qty: 1
+    remaining_qty: 1
+- date: '2026-04-06'
+  events:
+  - item: Milk
+    consumed_qty: 2
+    remaining_qty: 2
+  - item: Spinach
+    consumed_qty: 1
+    remaining_qty: 5
+  - item: Apples
+    consumed_qty: 1
+    remaining_qty: 5
+  - item: Coffee Beans
+    consumed_qty: 1
+    remaining_qty: 5
+- date: '2026-04-07'
+  events:
+  - item: Spinach
+    consumed_qty: 2
+    remaining_qty: 1
+  - item: Dry Bread
+    consumed_qty: 2
+    remaining_qty: 1
+- date: '2026-04-08'
+  events:
+  - item: Milk
+    consumed_qty: 1
+    remaining_qty: 3
+  - item: Spinach
+    consumed_qty: 2
+    remaining_qty: 1
+  - item: Dry Bread
+    consumed_qty: 1
+    remaining_qty: 4
+- date: '2026-04-09'
+  events:
+  - item: Milk
+    consumed_qty: 1
+    remaining_qty: 1
+  - item: Spinach
+    consumed_qty: 1
+    remaining_qty: 2
+  - item: Apples
+    consumed_qty: 2
+    remaining_qty: 4
+  - item: Dry Bread
+    consumed_qty: 2
+    remaining_qty: 5
+  - item: Coffee Beans
+    consumed_qty: 2
+    remaining_qty: 1
+- date: '2026-04-10'
+  events:
+  - item: Spinach
+    consumed_qty: 1
+    remaining_qty: 4
+  - item: Apples
+    consumed_qty: 1
+    remaining_qty: 2
+  - item: Coffee Beans
+    consumed_qty: 2
+    remaining_qty: 2
+- date: '2026-04-11'
+  events:
+  - item: Milk
+    consumed_qty: 2
+    remaining_qty: 1
+  - item: Spinach
+    consumed_qty: 1
+    remaining_qty: 4
+  - item: Apples
+    consumed_qty: 1
+    remaining_qty: 4
+  - item: Coffee Beans
+    consumed_qty: 2
+    remaining_qty: 3
+- date: '2026-04-12'
+  events:
+  - item: Milk
+    consumed_qty: 1
+    remaining_qty: 1
+  - item: Spinach
+    consumed_qty: 2
+    remaining_qty: 1
+  - item: Coffee Beans
+    consumed_qty: 1
+    remaining_qty: 4
+- date: '2026-04-13'
+  events:
+  - item: Milk
+    consumed_qty: 2
+    remaining_qty: 2
+- date: '2026-04-14'
+  events:
+  - item: Milk
+    consumed_qty: 2
+    remaining_qty: 2
+  - item: Spinach
+    consumed_qty: 1
+    remaining_qty: 2
+  - item: Apples
+    consumed_qty: 2
+    remaining_qty: 1
+- date: '2026-04-15'
+  events:
+  - item: Milk
+    consumed_qty: 1
+    remaining_qty: 1
+  - item: Spinach
+    consumed_qty: 2
+    remaining_qty: 5
+- date: '2026-04-16'
+  events:
+  - item: Milk
+    consumed_qty: 1
+    remaining_qty: 5
+  - item: Spinach
+    consumed_qty: 2
+    remaining_qty: 4
+  - item: Dry Bread
+    consumed_qty: 2
+    remaining_qty: 4
+  - item: Coffee Beans
+    consumed_qty: 1
+    remaining_qty: 5
+- date: '2026-04-17'
+  events:
+  - item: Milk
+    consumed_qty: 1
+    remaining_qty: 3
+  - item: Spinach
+    consumed_qty: 1
+    remaining_qty: 3
+  - item: Apples
+    consumed_qty: 1
+    remaining_qty: 2
+  - item: Coffee Beans
+    consumed_qty: 2
+    remaining_qty: 2
+- date: '2026-04-18'
+  events:
+  - item: Milk
+    consumed_qty: 1
+    remaining_qty: 5
+  - item: Apples
+    consumed_qty: 1
+    remaining_qty: 4
+  - item: Dry Bread
+    consumed_qty: 1
+    remaining_qty: 2
+- date: '2026-04-19'
+  events:
+  - item: Milk
+    consumed_qty: 1
+    remaining_qty: 1
+  - item: Spinach
+    consumed_qty: 1
+    remaining_qty: 1
+- date: '2026-04-20'
+  events:
+  - item: Milk
+    consumed_qty: 1
+    remaining_qty: 5
+  - item: Spinach
+    consumed_qty: 1
+    remaining_qty: 2
+  - item: Apples
+    consumed_qty: 2
+    remaining_qty: 2
+  - item: Dry Bread
+    consumed_qty: 1
+    remaining_qty: 5
+  - item: Coffee Beans
+    consumed_qty: 2
+    remaining_qty: 2
+- date: '2026-04-21'
+  events:
+  - item: Apples
+    consumed_qty: 1
+    remaining_qty: 2
+  - item: Coffee Beans
+    consumed_qty: 1
+    remaining_qty: 3
+- date: '2026-04-22'
+  events:
+  - item: Apples
+    consumed_qty: 2
+    remaining_qty: 4
+  - item: Coffee Beans
+    consumed_qty: 1
+    remaining_qty: 4
+- date: '2026-04-23'
+  events:
+  - item: Spinach
+    consumed_qty: 1
+    remaining_qty: 2
+  - item: Apples
+    consumed_qty: 2
+    remaining_qty: 3
+  - item: Dry Bread
+    consumed_qty: 2
+    remaining_qty: 1
+  - item: Coffee Beans
+    consumed_qty: 2
+    remaining_qty: 1
+- date: '2026-04-24'
+  events:
+  - item: Milk
+    consumed_qty: 2
+    remaining_qty: 5
+  - item: Apples
+    consumed_qty: 2
+    remaining_qty: 4
+  - item: Dry Bread
+    consumed_qty: 1
+    remaining_qty: 2
+- date: '2026-04-25'
+  events:
+  - item: Milk
+    consumed_qty: 2
+    remaining_qty: 3
+  - item: Apples
+    consumed_qty: 1
+    remaining_qty: 3
+- date: '2026-04-26'
+  events:
+  - item: Milk
+    consumed_qty: 2
+    remaining_qty: 3
+  - item: Spinach
+    consumed_qty: 2
+    remaining_qty: 5
+  - item: Apples
+    consumed_qty: 1
+    remaining_qty: 5
+  - item: Dry Bread
+    consumed_qty: 2
+    remaining_qty: 2
+  - item: Coffee Beans
+    consumed_qty: 1
+    remaining_qty: 1
+- date: '2026-04-27'
+  events:
+  - item: Milk
+    consumed_qty: 1
+    remaining_qty: 3
+  - item: Apples
+    consumed_qty: 2
+    remaining_qty: 3
+  - item: Coffee Beans
+    consumed_qty: 1
+    remaining_qty: 5
+- date: '2026-04-28'
+  events:
+  - item: Milk
+    consumed_qty: 1
+    remaining_qty: 2
+  - item: Spinach
+    consumed_qty: 1
+    remaining_qty: 1
+  - item: Apples
+    consumed_qty: 1
+    remaining_qty: 1
+  - item: Coffee Beans
+    consumed_qty: 1
+    remaining_qty: 1
+- date: '2026-04-29'
+  events:
+  - item: Milk
+    consumed_qty: 2
+    remaining_qty: 5
+  - item: Spinach
+    consumed_qty: 1
+    remaining_qty: 2
+  - item: Apples
+    consumed_qty: 1
+    remaining_qty: 4
+  - item: Dry Bread
+    consumed_qty: 1
+    remaining_qty: 1
+  - item: Coffee Beans
+    consumed_qty: 1
+    remaining_qty: 2
+- date: '2026-04-30'
+  events:
+  - item: Milk
+    consumed_qty: 2
+    remaining_qty: 5
+  - item: Spinach
+    consumed_qty: 2
+    remaining_qty: 2
+  - item: Apples
+    consumed_qty: 1
+    remaining_qty: 2
+  - item: Dry Bread
+    consumed_qty: 2
+    remaining_qty: 3
+  - item: Coffee Beans
+    consumed_qty: 1
+    remaining_qty: 4
+- date: '2026-05-01'
+  events:
+  - item: Spinach
+    consumed_qty: 2
+    remaining_qty: 3
+  - item: Coffee Beans
+    consumed_qty: 1
+    remaining_qty: 3
+- date: '2026-05-02'
+  events:
+  - item: Milk
+    consumed_qty: 2
+    remaining_qty: 4
+  - item: Apples
+    consumed_qty: 2
+    remaining_qty: 4
+  - item: Dry Bread
+    consumed_qty: 2
+    remaining_qty: 3
+  - item: Coffee Beans
+    consumed_qty: 2
+    remaining_qty: 2
