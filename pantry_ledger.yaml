@@ -1,13 +1,12 @@
-inventory:
-  - name: apples
-    quantity: 2
-    estimated_expiry: '2026-05-10'
-  - name: milk
-    quantity: 1
-    estimated_expiry: '2026-05-05'
-  - name: spinach
-    quantity: 1
-    estimated_expiry: '2026-05-04'
-  - name: apples
-    quantity: 2
-    estimated_expiry: '2026-05-10'
+- name: apples
+  quantity: 2
+  estimated_expiry: '2026-05-10'
+- name: Milk Blinkit
+  quantity: 1
+  estimated_expiry: '2026-05-05'
+- name: Spinach Zepto
+  quantity: 500
+  estimated_expiry: '2026-05-07'
+- name: Dry Bread GroceryHub
+  quantity: 2
+  estimated_expiry: '2026-06-01'
