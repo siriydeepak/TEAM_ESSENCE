@@ -1,0 +1,35 @@
+{
+  "name": "AetherShelf — Smart Kitchen Manager",
+  "short_name": "AetherShelf",
+  "description": "AI-powered smart kitchen & pantry manager with passive receipt ingestion",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#e6eee9",
+  "theme_color": "#006b57",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["food", "lifestyle", "utilities"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Add Item",
+      "short_name": "Add",
+      "description": "Quickly add an item to your pantry",
+      "url": "/?action=add",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
