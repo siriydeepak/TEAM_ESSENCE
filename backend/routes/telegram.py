@@ -70,7 +70,7 @@ async def generate_code(body: SyncCodeRequest):
         raise HTTPException(status_code=400, detail="web_user_id is required")
 
     code           = generate_sync_code(body.web_user_id)
-    already_linked = is_linked(body.web_user_id)
+    already_linked = await is_linked(body.web_user_id)
     ttl            = get_code_ttl(code)
     bot_username   = os.getenv("TELEGRAM_BOT_USERNAME", "AetherShelfBot")
 
@@ -78,7 +78,7 @@ async def generate_code(body: SyncCodeRequest):
         "success": True,
         "sync_code": code,
         "already_linked": already_linked,
-        "telegram_id": get_telegram_id(body.web_user_id),
+        "telegram_id": await get_telegram_id(body.web_user_id),
         "ttl_seconds": ttl,
         "message": (
             "Kitchen already linked to Telegram" if already_linked
@@ -91,11 +91,11 @@ async def generate_code(body: SyncCodeRequest):
 @router.get("/status")
 async def get_link_status(web_user_id: str):
     """Check whether a web account has a linked Telegram account."""
-    linked = is_linked(web_user_id)
+    linked = await is_linked(web_user_id)
     return {
         "success": True,
         "linked": linked,
-        "telegram_id": get_telegram_id(web_user_id) if linked else None,
+        "telegram_id": await get_telegram_id(web_user_id) if linked else None,
     }
 
 

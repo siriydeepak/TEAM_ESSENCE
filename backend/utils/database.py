@@ -136,10 +136,27 @@ class DatabaseManager:
                 );
             """)
             
+            # Telegram links table (Aether-Link Protocol)
+            await conn.execute("""
+                CREATE TABLE IF NOT EXISTS telegram_links (
+                    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                    web_user_id VARCHAR(255) NOT NULL UNIQUE,
+                    telegram_user_id BIGINT NOT NULL,
+                    chat_id BIGINT NOT NULL,
+                    linked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    last_notified_at TIMESTAMP,
+                    active BOOLEAN DEFAULT TRUE,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            """)
+            
             # Create indexes for better performance
             await conn.execute("CREATE INDEX IF NOT EXISTS idx_inventory_expiry_date ON inventory(expiry_date);")
             await conn.execute("CREATE INDEX IF NOT EXISTS idx_inventory_category ON inventory(category);")
             await conn.execute("CREATE INDEX IF NOT EXISTS idx_expiry_logs_date ON expiry_logs(date);")
+            await conn.execute("CREATE INDEX IF NOT EXISTS idx_telegram_links_web_user ON telegram_links(web_user_id);")
+            await conn.execute("CREATE INDEX IF NOT EXISTS idx_telegram_links_telegram_user ON telegram_links(telegram_user_id);")
             
             logger.info("Database tables created/verified successfully")
             

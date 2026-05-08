@@ -239,8 +239,8 @@ async def virtual_kitchen_status(web_user_id: str):
         "success": True,
         "total_items": len(items),
         "expiring_soon": len(expiring),
-        "telegram_linked": is_linked(web_user_id),
-        "telegram_id": get_telegram_id(web_user_id),
+        "telegram_linked": await is_linked(web_user_id),
+        "telegram_id": await get_telegram_id(web_user_id),
         "setup_complete": len(items) > 0,
     }
 

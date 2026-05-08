@@ -3,7 +3,7 @@ Telegram Bot Service — Aether-Link Protocol (hardened).
 Key design decisions:
   - secrets.token_hex() for cryptographically-secure code generation
   - 5-minute TTL enforced at generation AND validation time
-  - SyncCodeStore is a thread-safe in-memory class (swap .store dict for Redis in prod)
+  - SyncCodeStore uses database for persistent links, in-memory for pending codes
   - Proactive message helper: notify_user(web_user_id, text)
 """
 import os
@@ -23,14 +23,16 @@ CODE_TTL_MINUTES = 5   # short window — more secure, better UX
 # ---------------------------------------------------------------------------
 class SyncCodeStore:
     """
-    In-memory store for pending Aether-Link handshakes.
-    Replace self._pending with a Redis client for horizontal scaling.
+    Hybrid store for Aether-Link handshakes.
+    - Pending codes: In-memory (short-lived, 5 min TTL)
+    - Linked accounts: Database (persistent)
+    Replace self._pending with Redis for horizontal scaling.
     """
     def __init__(self):
         # { sync_code: {"web_user_id": str, "created_at": datetime, "used": bool} }
         self._pending: Dict[str, Dict[str, Any]] = {}
-        # { web_user_id: {"telegram_user_id": int, "chat_id": int, "linked_at": datetime} }
-        self._linked: Dict[str, Dict[str, Any]] = {}
+        # Cache for linked accounts (loaded from DB on demand)
+        self._linked_cache: Dict[str, Dict[str, Any]] = {}
     # ── Generation ──────────────────────────────────────────────────────────
     def generate(self, web_user_id: str) -> str:
         """
@@ -63,9 +65,10 @@ class SyncCodeStore:
         logger.info(f"[AetherLink] Generated sync code for {web_user_id}, expires in {CODE_TTL_MINUTES}m")
         return code
     # ── Validation & Pairing ─────────────────────────────────────────────────
-    def pair(self, code: str, telegram_user_id: int, chat_id: int) -> Optional[str]:
+    async def pair(self, code: str, telegram_user_id: int, chat_id: int) -> Optional[str]:
         """
         Validate code and pair telegram_user_id with web_user_id.
+        Stores link in database for persistence.
         Returns web_user_id on success, None on any failure.
         """
         self._purge_expired()
@@ -81,26 +84,128 @@ class SyncCodeStore:
             return None
         web_user_id = meta["web_user_id"]
         meta["used"] = True
-        self._linked[web_user_id] = {
-            "telegram_user_id": telegram_user_id,
-            "chat_id": chat_id,
-            "linked_at": datetime.utcnow(),
-        }
-        logger.info(f"[AetherLink] ✅ Paired {web_user_id} ↔ Telegram {telegram_user_id}")
+        
+        # Store in database for persistence
+        try:
+            from ..utils.database import db_manager
+            await db_manager.execute_command("""
+                INSERT INTO telegram_links (web_user_id, telegram_user_id, chat_id, linked_at)
+                VALUES ($1, $2, $3, $4)
+                ON CONFLICT (web_user_id) 
+                DO UPDATE SET 
+                    telegram_user_id = $2, 
+                    chat_id = $3, 
+                    linked_at = $4,
+                    active = TRUE,
+                    updated_at = NOW()
+            """, web_user_id, telegram_user_id, chat_id, datetime.utcnow())
+            
+            # Update cache
+            self._linked_cache[web_user_id] = {
+                "telegram_user_id": telegram_user_id,
+                "chat_id": chat_id,
+                "linked_at": datetime.utcnow(),
+            }
+            logger.info(f"[AetherLink] ✅ Paired {web_user_id} ↔ Telegram {telegram_user_id} (persisted to DB)")
+        except Exception as exc:
+            logger.error(f"[AetherLink] Failed to persist link to database: {exc}")
+            # Fallback to cache-only (will be lost on restart)
+            self._linked_cache[web_user_id] = {
+                "telegram_user_id": telegram_user_id,
+                "chat_id": chat_id,
+                "linked_at": datetime.utcnow(),
+            }
+            logger.warning(f"[AetherLink] ⚠️ Link stored in cache only (not persistent)")
+        
         return web_user_id
     # ── Queries ──────────────────────────────────────────────────────────────
-    def is_linked(self, web_user_id: str) -> bool:
-        return web_user_id in self._linked
-    def get_chat_id(self, web_user_id: str) -> Optional[int]:
-        info = self._linked.get(web_user_id)
-        return info["chat_id"] if info else None
-    def get_telegram_id(self, web_user_id: str) -> Optional[int]:
-        info = self._linked.get(web_user_id)
-        return info["telegram_user_id"] if info else None
-    def get_linked_user(self, telegram_user_id: int) -> Optional[str]:
-        for uid, info in self._linked.items():
+    async def is_linked(self, web_user_id: str) -> bool:
+        """Check if web user has a linked Telegram account."""
+        # Check cache first
+        if web_user_id in self._linked_cache:
+            return True
+        
+        # Query database
+        try:
+            from ..utils.database import db_manager
+            result = await db_manager.fetch_one(
+                "SELECT * FROM telegram_links WHERE web_user_id = $1 AND active = TRUE",
+                web_user_id
+            )
+            if result:
+                # Update cache
+                self._linked_cache[web_user_id] = {
+                    "telegram_user_id": result["telegram_user_id"],
+                    "chat_id": result["chat_id"],
+                    "linked_at": result["linked_at"],
+                }
+                return True
+        except Exception as exc:
+            logger.error(f"[AetherLink] Database query failed: {exc}")
+        
+        return False
+    
+    async def get_chat_id(self, web_user_id: str) -> Optional[int]:
+        """Get Telegram chat_id for a web user."""
+        # Check cache first
+        info = self._linked_cache.get(web_user_id)
+        if info:
+            return info["chat_id"]
+        
+        # Query database
+        try:
+            from ..utils.database import db_manager
+            result = await db_manager.fetch_one(
+                "SELECT chat_id FROM telegram_links WHERE web_user_id = $1 AND active = TRUE",
+                web_user_id
+            )
+            if result:
+                return result["chat_id"]
+        except Exception as exc:
+            logger.error(f"[AetherLink] Database query failed: {exc}")
+        
+        return None
+    
+    async def get_telegram_id(self, web_user_id: str) -> Optional[int]:
+        """Get Telegram user_id for a web user."""
+        # Check cache first
+        info = self._linked_cache.get(web_user_id)
+        if info:
+            return info["telegram_user_id"]
+        
+        # Query database
+        try:
+            from ..utils.database import db_manager
+            result = await db_manager.fetch_one(
+                "SELECT telegram_user_id FROM telegram_links WHERE web_user_id = $1 AND active = TRUE",
+                web_user_id
+            )
+            if result:
+                return result["telegram_user_id"]
+        except Exception as exc:
+            logger.error(f"[AetherLink] Database query failed: {exc}")
+        
+        return None
+    
+    async def get_linked_user(self, telegram_user_id: int) -> Optional[str]:
+        """Get web_user_id for a Telegram user."""
+        # Check cache first
+        for uid, info in self._linked_cache.items():
             if info["telegram_user_id"] == telegram_user_id:
                 return uid
+        
+        # Query database
+        try:
+            from ..utils.database import db_manager
+            result = await db_manager.fetch_one(
+                "SELECT web_user_id FROM telegram_links WHERE telegram_user_id = $1 AND active = TRUE",
+                telegram_user_id
+            )
+            if result:
+                return result["web_user_id"]
+        except Exception as exc:
+            logger.error(f"[AetherLink] Database query failed: {exc}")
+        
         return None
     def ttl_seconds(self, code: str) -> int:
         """Remaining TTL in seconds for a given code."""
@@ -124,14 +229,14 @@ _store = SyncCodeStore()
 # ---------------------------------------------------------------------------
 def generate_sync_code(web_user_id: str) -> str:
     return _store.generate(web_user_id)
-def pair_code(code: str, telegram_user_id: int, chat_id: int) -> Optional[str]:
-    return _store.pair(code, telegram_user_id, chat_id)
-def is_linked(web_user_id: str) -> bool:
-    return _store.is_linked(web_user_id)
-def get_chat_id(web_user_id: str) -> Optional[int]:
-    return _store.get_chat_id(web_user_id)
-def get_telegram_id(web_user_id: str) -> Optional[int]:
-    return _store.get_telegram_id(web_user_id)
+async def pair_code(code: str, telegram_user_id: int, chat_id: int) -> Optional[str]:
+    return await _store.pair(code, telegram_user_id, chat_id)
+async def is_linked(web_user_id: str) -> bool:
+    return await _store.is_linked(web_user_id)
+async def get_chat_id(web_user_id: str) -> Optional[int]:
+    return await _store.get_chat_id(web_user_id)
+async def get_telegram_id(web_user_id: str) -> Optional[int]:
+    return await _store.get_telegram_id(web_user_id)
 def get_code_ttl(code: str) -> int:
     return _store.ttl_seconds(code)
 # ---------------------------------------------------------------------------
@@ -171,7 +276,7 @@ async def send_message(chat_id: int, text: str, parse_mode: str = "HTML") -> boo
         return False
 async def notify_user(web_user_id: str, text: str) -> bool:
     """Send a message to the Telegram account linked to this web user."""
-    chat_id = get_chat_id(web_user_id)
+    chat_id = await get_chat_id(web_user_id)
     if chat_id is None:
         logger.debug(f"[Telegram] {web_user_id} has no linked account")
         return False
@@ -209,7 +314,7 @@ async def handle_webhook_update(update: Dict[str, Any]) -> None:
         return
     # ── /status ──────────────────────────────────────────────────────────────
     if text.lower() == "/status":
-        linked_user = _store.get_linked_user(tg_user_id)
+        linked_user = await _store.get_linked_user(tg_user_id)
         if linked_user:
             await send_message(
                 chat_id,
@@ -234,7 +339,7 @@ async def handle_webhook_update(update: Dict[str, Any]) -> None:
         "Or just type your 6-digit Sync Code directly.",
     )
 async def _handle_code(code: str, tg_user_id: int, chat_id: int, first_name: str) -> None:
-    web_user_id = pair_code(code, tg_user_id, chat_id)
+    web_user_id = await pair_code(code, tg_user_id, chat_id)
     if web_user_id:
         await send_message(
             chat_id,
