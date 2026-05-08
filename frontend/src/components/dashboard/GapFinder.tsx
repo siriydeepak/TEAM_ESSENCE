@@ -1,7 +1,24 @@
 import { getRecipeSuggestions } from '../../data/mockData'
+import { useCart } from '../../context/CartContext'
 
 export default function GapFinder() {
   const recipes = getRecipeSuggestions()
+  const { addToCart } = useCart()
+
+  const handleAddToCart = (recipe: any) => {
+    // Add each missing ingredient to cart
+    recipe.ingredients_needed.forEach((ingredient: string) => {
+      addToCart({
+        id: `${recipe.id}-${ingredient.toLowerCase().replace(/\s+/g, '-')}`,
+        name: ingredient,
+        quantity: 1,
+        unit: 'unit',
+        price: recipe.gap_cost / recipe.ingredients_needed.length,
+        source: 'Smart Suggestion',
+        recipe_name: recipe.name
+      })
+    })
+  }
 
   return (
     <div className="dashboard-card stripe-stable">
@@ -96,11 +113,30 @@ export default function GapFinder() {
                   </div>
                 </div>
 
-                {/* Action Button */}
-                <button className="w-full mt-4 dark-gradient neon-border-cyan text-white px-4 py-2 rounded-xl font-['Plus_Jakarta_Sans'] font-semibold text-sm transition-all active:scale-95 flex items-center justify-center gap-2">
-                  <span className="material-symbols-outlined text-lg">add_shopping_cart</span>
-                  Add Missing Items
-                </button>
+                {/* Action Buttons */}
+                <div className="flex gap-2">
+                  <a
+                    href={recipe.recipe_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 dark-gradient neon-border-cyan text-white px-4 py-2 rounded-xl font-['Plus_Jakarta_Sans'] font-semibold text-sm transition-all active:scale-95 flex items-center justify-center gap-2 hover:shadow-[0_0_25px_rgba(0,255,209,0.5)]"
+                  >
+                    <span className="material-symbols-outlined text-lg">restaurant_menu</span>
+                    View Recipe
+                  </a>
+                  <button 
+                    onClick={() => handleAddToCart(recipe)}
+                    className="flex-1 dark-gradient neon-border-orange text-white px-4 py-2 rounded-xl font-['Plus_Jakarta_Sans'] font-semibold text-sm transition-all active:scale-95 flex items-center justify-center gap-2 hover:shadow-[0_0_25px_rgba(255,138,0,0.5)]"
+                  >
+                    <span className="material-symbols-outlined text-lg">add_shopping_cart</span>
+                    Add Items (₹{recipe.gap_cost})
+                  </button>
+                </div>
+                
+                {/* Recipe Source */}
+                <p className="text-xs text-[#71717a] text-center font-['Plus_Jakarta_Sans'] mt-2">
+                  Recipe from <span className="font-semibold">{recipe.source}</span>
+                </p>
               </div>
             </div>
           ))
