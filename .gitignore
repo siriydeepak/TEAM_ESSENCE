@@ -397,3 +397,5 @@ secrets.json
 *.backup
 *.old
 *.orig
+.env
+credentials.json
