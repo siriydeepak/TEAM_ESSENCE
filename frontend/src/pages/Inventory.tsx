@@ -1,60 +1,103 @@
-import React from 'react'
-import { Plus, Search, Filter } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import DashboardLayout from '../components/layout/DashboardLayout'
+import InventoryList from '../components/dashboard/InventoryList'
+import { mockProducts, getEatMeFirstProducts } from '../data/mockData'
 
-const Inventory: React.FC = () => {
+export default function InventoryPage() {
+  const navigate = useNavigate()
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [filter, setFilter] = useState<'all' | 'expiring' | 'healthy'>('all')
+
+  useEffect(() => {
+    const auth = localStorage.getItem('isAuthenticated')
+    if (!auth) {
+      navigate('/login')
+    } else {
+      setIsAuthenticated(true)
+    }
+  }, [navigate])
+
+  if (!isAuthenticated) {
+    return null
+  }
+
+  const getFilteredProducts = () => {
+    switch (filter) {
+      case 'expiring':
+        return getEatMeFirstProducts()
+      case 'healthy':
+        return mockProducts.filter(p => ['good', 'optimal'].includes(p.status))
+      default:
+        return mockProducts
+    }
+  }
+
+  const filteredProducts = getFilteredProducts()
+
   return (
-    <div className="p-6">
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
+    <DashboardLayout>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Inventory</h1>
-            <p className="text-gray-600 mt-2">Manage your food items and track expiration dates</p>
+            <h1 className="font-['Epilogue'] text-4xl font-bold text-[#1a1c1c] mb-2">
+              Expiry Logs
+            </h1>
+            <p className="text-[#71717a] font-['Plus_Jakarta_Sans']">
+              Complete inventory with expiration tracking
+            </p>
           </div>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Item
+          <button className="dark-gradient neon-border-cyan text-white px-6 py-3 rounded-xl flex items-center gap-2 active:scale-95 transition-transform">
+            <span className="material-symbols-outlined text-lg">add</span>
+            <span className="font-['Plus_Jakarta_Sans'] font-semibold">Add Item</span>
           </button>
         </div>
-      </div>
 
-      {/* Search and Filter Bar */}
-      <div className="bg-white rounded-lg shadow p-4 mb-6">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1 relative">
-            <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search items..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-          <button className="flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-            <Filter className="w-4 h-4 mr-2" />
-            Filter
-          </button>
-        </div>
-      </div>
-
-      {/* Inventory Grid */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Your Items</h2>
-        </div>
-        <div className="p-6">
-          <div className="text-center py-12">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Plus className="w-8 h-8 text-gray-400" />
-            </div>
-            <p className="text-gray-500 text-lg mb-2">No items in your inventory</p>
-            <p className="text-sm text-gray-400 mb-6">Add your first item to get started with smart inventory management</p>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg">
-              Add Your First Item
+        {/* Filter Tabs */}
+        <div className="dashboard-card stripe-stable">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setFilter('all')}
+              className={`px-6 py-3 rounded-xl font-['Plus_Jakarta_Sans'] font-semibold text-sm transition-all ${
+                filter === 'all'
+                  ? 'dark-gradient neon-border-cyan text-white'
+                  : 'bg-[#eeeeed] text-[#71717a] hover:bg-[#d4d4d8]'
+              }`}
+            >
+              All Items ({mockProducts.length})
+            </button>
+            <button
+              onClick={() => setFilter('expiring')}
+              className={`px-6 py-3 rounded-xl font-['Plus_Jakarta_Sans'] font-semibold text-sm transition-all ${
+                filter === 'expiring'
+                  ? 'dark-gradient neon-border-orange text-white'
+                  : 'bg-[#eeeeed] text-[#71717a] hover:bg-[#d4d4d8]'
+              }`}
+            >
+              Expiring Soon ({getEatMeFirstProducts().length})
+            </button>
+            <button
+              onClick={() => setFilter('healthy')}
+              className={`px-6 py-3 rounded-xl font-['Plus_Jakarta_Sans'] font-semibold text-sm transition-all ${
+                filter === 'healthy'
+                  ? 'dark-gradient neon-border-cyan text-white'
+                  : 'bg-[#eeeeed] text-[#71717a] hover:bg-[#d4d4d8]'
+              }`}
+            >
+              Healthy ({mockProducts.filter(p => ['good', 'optimal'].includes(p.status)).length})
             </button>
           </div>
         </div>
+
+        {/* Inventory List */}
+        <InventoryList items={filteredProducts} loading={false} />
       </div>
-    </div>
+
+      {/* Material Symbols Font */}
+      <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet"
+      />
+    </DashboardLayout>
   )
 }
-
-export default Inventory
