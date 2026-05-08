@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="description" content="Smart inventory management system with weather integration and expiration tracking" />
+    <meta name="keywords" content="inventory, management, food, expiration, weather, smart, pantry" />
+    <meta name="author" content="TEAM_ESSENCE" />
+    
+    <!-- Apple PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="AetherShelf" />
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+    
+    <!-- Microsoft PWA Meta Tags -->
+    <meta name="msapplication-TileColor" content="#2563eb" />
+    <meta name="msapplication-TileImage" content="/icons/icon-144x144.png" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="AetherShelf - Smart Inventory Management" />
+    <meta property="og:description" content="Smart inventory management system with weather integration and expiration tracking" />
+    <meta property="og:image" content="/icons/icon-512x512.png" />
+    <meta property="og:url" content="https://aethershelf.vercel.app" />
+    <meta property="og:site_name" content="AetherShelf" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AetherShelf - Smart Inventory Management" />
+    <meta name="twitter:description" content="Smart inventory management system with weather integration and expiration tracking" />
+    <meta name="twitter:image" content="/icons/icon-512x512.png" />
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://api.openweathermap.org" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <title>AetherShelf - Smart Inventory Management</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
+  </body>
+</html>
