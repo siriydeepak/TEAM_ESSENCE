@@ -8,6 +8,7 @@ import WeatherImpact from '../components/dashboard/WeatherImpact'
 import GapFinder from '../components/dashboard/GapFinder'
 import SmartCart from '../components/dashboard/SmartCart'
 import Analytics from '../components/dashboard/Analytics'
+import LinkKitchen from '../components/dashboard/LinkKitchen'
 
 export default function DashboardPage() {
   const navigate = useNavigate()
@@ -52,6 +53,9 @@ export default function DashboardPage() {
         {/* Analytics Overview */}
         {analytics && <Analytics data={analytics} />}
 
+        {/* Link Your Kitchen — Aether-Link Protocol */}
+        <LinkKitchen />
+
         {/* Weather Impact */}
         <WeatherImpact />
 
@@ -75,3 +79,4 @@ export default function DashboardPage() {
     </DashboardLayout>
   )
 }
+
