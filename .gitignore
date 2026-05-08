@@ -264,6 +264,9 @@ cython_debug/
 *.swo
 *~
 
+# Kiro development files
+.kiro/
+
 # OS generated files
 .DS_Store
 .DS_Store?
