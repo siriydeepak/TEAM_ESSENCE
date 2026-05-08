@@ -1,16 +1,5 @@
-import { ReactNode, useState } from 'react'
+import { ReactNode } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { 
-  Home, 
-  Package, 
-  ShoppingCart, 
-  TrendingUp, 
-  Settings, 
-  LogOut,
-  Menu,
-  X,
-  Mail
-} from 'lucide-react'
 import toast from 'react-hot-toast'
 
 interface DashboardLayoutProps {
@@ -20,8 +9,6 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const navigate = useNavigate()
   const location = useLocation()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const userEmail = typeof window !== 'undefined' ? localStorage.getItem('userEmail') : ''
 
   const handleLogout = () => {
     localStorage.removeItem('isAuthenticated')
@@ -31,120 +18,121 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   }
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Inventory', href: '/inventory', icon: Package },
-    { name: 'Smart Cart', href: '/cart', icon: ShoppingCart },
-    { name: 'Analytics', href: '/analytics', icon: TrendingUp },
-    { name: 'Settings', href: '/settings', icon: Settings },
+    { name: 'Product Info', href: '/dashboard', icon: 'inventory_2' },
+    { name: 'Smart Restock', href: '/settings', icon: 'shopping_cart' },
+    { name: 'Expiry Logs', href: '/inventory', icon: 'schedule' },
+    { name: 'Analytics', href: '/analytics', icon: 'analytics' },
   ]
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile sidebar backdrop */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+  const isActive = (path: string) => location.pathname === path
 
-      {/* Sidebar */}
-      <aside className={`
-        fixed top-0 left-0 z-50 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-        lg:translate-x-0
-      `}>
-        <div className="flex flex-col h-full">
+  return (
+    <div className="min-h-screen relative">
+      {/* Top AppBar - Lighter style */}
+      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-white/95 border-b border-[#e4e4e7] shadow-lg">
+        <div className="flex items-center justify-between px-6 py-4 max-w-[780px] mx-auto">
           {/* Logo */}
-          <div className="flex items-center justify-between p-6 border-b">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary rounded-lg">
-                <Mail className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-xl font-bold text-gray-900">AetherShelf</span>
-            </div>
-            <button 
-              onClick={() => setSidebarOpen(false)}
-              className="lg:hidden"
-            >
-              <X className="w-6 h-6" />
-            </button>
+          <div className="flex items-center gap-3">
+            <img 
+              src="/assets/logo.png" 
+              alt="AetherShelf Logo" 
+              className="h-12 w-12 object-contain"
+            />
+            <h1 className="text-3xl md:text-4xl font-['Dancing_Script'] font-bold">
+              <span className="text-[#006b57]">Aether</span>
+              <span className="text-[#ff8a00]">Shelf</span>
+            </h1>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-2">
-            {navigation.map((item) => {
-              const Icon = item.icon
-              const isActive = location.pathname === item.href
-              return (
-                <button
-                  key={item.name}
-                  onClick={() => {
-                    navigate(item.href)
-                    setSidebarOpen(false)
-                  }}
-                  className={`
-                    w-full flex items-center gap-3 px-4 py-3 rounded-lg transition
-                    ${isActive 
-                      ? 'bg-primary text-white' 
-                      : 'text-gray-700 hover:bg-gray-100'
-                    }
-                  `}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span className="font-medium">{item.name}</span>
-                </button>
-              )
-            })}
-          </nav>
-
-          {/* User section */}
-          <div className="p-4 border-t">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">
-                {userEmail?.[0]?.toUpperCase() || 'U'}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
-                  {userEmail || 'User'}
-                </p>
-                <p className="text-xs text-gray-500">Gmail Connected</p>
-              </div>
-            </div>
+          {/* Action Buttons */}
+          <div className="flex items-center gap-3">
+            {location.pathname !== '/dashboard' && (
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="px-4 py-2 text-sm font-['Plus_Jakarta_Sans'] font-semibold text-[#006b57] hover:text-[#00ffd1] transition-colors flex items-center gap-2"
+              >
+                <span className="material-symbols-outlined text-lg">home</span>
+                <span className="hidden md:inline">Home</span>
+              </button>
+            )}
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+              className="px-4 py-2 text-sm font-['Plus_Jakarta_Sans'] font-semibold text-[#71717a] hover:text-[#006b57] transition-colors"
             >
-              <LogOut className="w-5 h-5" />
-              <span className="font-medium">Logout</span>
+              Logout
             </button>
           </div>
         </div>
-      </aside>
+      </header>
 
       {/* Main content */}
-      <div className="lg:ml-64">
-        {/* Top bar */}
-        <header className="bg-white shadow-sm sticky top-0 z-30">
-          <div className="flex items-center justify-between px-4 py-4">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {navigation.find(item => item.href === location.pathname)?.name || 'Dashboard'}
-            </h1>
-            <div className="w-6 lg:hidden" /> {/* Spacer for mobile */}
+      <main className="pt-24 pb-32 px-6 max-w-[780px] mx-auto relative z-10">
+        <div className="bg-white shadow-2xl rounded-2xl overflow-hidden min-h-[calc(100vh-200px)]">
+          <div className="p-6">
+            {children}
           </div>
-        </header>
+        </div>
+      </main>
 
-        {/* Page content */}
-        <main className="p-4 lg:p-8">
-          {children}
-        </main>
+      {/* Mobile Bottom Navigation */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl bg-white/95 border-t border-[#e4e4e7] shadow-2xl">
+        <div className="grid grid-cols-4 max-w-[780px] mx-auto">
+          {navigation.map((item) => {
+            const active = isActive(item.href)
+            return (
+              <button
+                key={item.name}
+                onClick={() => navigate(item.href)}
+                className={`flex flex-col items-center justify-center py-3 px-2 transition-all ${
+                  active
+                    ? 'text-[#00ffd1] bg-gradient-to-b from-[#006b57]/10 to-transparent'
+                    : 'text-gray-500'
+                }`}
+              >
+                <span className={`material-symbols-outlined mb-1 ${active ? 'scale-110' : ''}`}>
+                  {item.icon}
+                </span>
+                <span className={`text-xs font-['Plus_Jakarta_Sans'] font-semibold ${
+                  active ? 'text-[#006b57]' : ''
+                }`}>
+                  {item.name.split(' ')[0]}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      </nav>
+
+      {/* Desktop Navigation Tabs */}
+      <div className="hidden md:block fixed top-24 left-1/2 -translate-x-1/2 z-50">
+        <div className="backdrop-blur-xl bg-white/95 rounded-2xl shadow-2xl border border-white/50 p-2">
+          <div className="flex gap-2">
+            {navigation.map((item) => {
+              const active = isActive(item.href)
+              return (
+                <button
+                  key={item.name}
+                  onClick={() => navigate(item.href)}
+                  className={`px-6 py-3 rounded-xl font-['Plus_Jakarta_Sans'] font-semibold text-sm transition-all flex items-center gap-2 ${
+                    active
+                      ? 'bg-gradient-to-r from-[#006b57] to-[#00ffd1] text-white shadow-lg scale-105'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-lg">{item.icon}</span>
+                  {item.name}
+                </button>
+              )
+            })}
+          </div>
+        </div>
       </div>
+
+      {/* Material Symbols Font */}
+      <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet"
+      />
     </div>
   )
 }

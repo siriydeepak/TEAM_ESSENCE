@@ -23,7 +23,10 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
-        <div className="App">
+        {/* Cyber-Kitchen Background */}
+        <div className="cyber-bg" />
+        
+        <div className="App relative z-10">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
@@ -37,8 +40,11 @@ function App() {
             toastOptions={{
               duration: 4000,
               style: {
-                background: '#363636',
-                color: '#fff',
+                background: '#121414',
+                color: '#00FFD1',
+                borderRadius: '0.75rem',
+                border: '2px solid #00FFD1',
+                boxShadow: '0 0 10px rgba(0, 255, 209, 0.3)',
               },
             }}
           />

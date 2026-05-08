@@ -1,99 +1,117 @@
-import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
-import { Lightbulb, ChefHat, TrendingUp } from 'lucide-react'
+import { getRecipeSuggestions } from '../../data/mockData'
 
 export default function GapFinder() {
-  const { data, isLoading } = useQuery({
-    queryKey: ['gap-finder'],
-    queryFn: async () => {
-      const res = await axios.get('/api/gap-finder')
-      return res.data
-    },
-    refetchInterval: 30000,
-  })
-
-  if (isLoading) {
-    return (
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-gray-200 rounded w-2/3"></div>
-          <div className="h-20 bg-gray-200 rounded"></div>
-        </div>
-      </div>
-    )
-  }
-
-  const suggestions = data?.suggestions || []
-  const topSuggestion = suggestions[0]
+  const recipes = getRecipeSuggestions()
 
   return (
-    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl shadow-sm p-6 border border-purple-100">
-      <div className="flex items-center gap-3 mb-4">
-        <Lightbulb className="w-6 h-6 text-purple-600" />
-        <h2 className="text-xl font-bold text-gray-900">Smart Suggestions</h2>
+    <div className="dashboard-card stripe-stable">
+      <div className="flex items-center gap-3 mb-6">
+        <span className="material-symbols-outlined neon-text-yellow text-3xl">lightbulb</span>
+        <h2 className="font-['Epilogue'] text-2xl font-semibold text-[#1a1c1c]">Recipe Suggestions</h2>
       </div>
 
-      {topSuggestion ? (
-        <div className="space-y-4">
-          <div className="bg-white rounded-lg p-4">
-            <div className="flex items-start gap-3 mb-3">
-              <ChefHat className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <h3 className="font-bold text-gray-900 mb-1">
-                  {topSuggestion.suggestion}
-                </h3>
-                <p className="text-sm text-gray-600 mb-2">
-                  {topSuggestion.recipe}
-                </p>
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium">
-                    {topSuggestion.cuisine}
-                  </span>
-                  <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
-                    {topSuggestion.meals} meals
-                  </span>
-                  <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium flex items-center gap-1">
-                    <TrendingUp className="w-3 h-3" />
-                    {topSuggestion.confidence}% match
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="border-t pt-3 mt-3">
-              <p className="text-xs font-semibold text-gray-700 mb-2">You have:</p>
-              <div className="flex flex-wrap gap-1 mb-3">
-                {topSuggestion.have.map((item: string, idx: number) => (
-                  <span key={idx} className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded">
-                    ✓ {item}
-                  </span>
-                ))}
-              </div>
-              <p className="text-xs font-semibold text-gray-700 mb-2">Missing:</p>
-              <p className="text-sm text-orange-600 font-medium">
-                {topSuggestion.missing}
-              </p>
-            </div>
+      <div className="space-y-4 max-h-[600px] overflow-y-auto no-scrollbar">
+        {recipes.length === 0 ? (
+          <div className="text-center py-8">
+            <span className="material-symbols-outlined text-5xl text-[#a1a1aa] mb-3">restaurant</span>
+            <p className="text-[#71717a] text-sm font-['Plus_Jakarta_Sans']">No recipe suggestions available</p>
           </div>
+        ) : (
+          recipes.map((recipe) => (
+            <div 
+              key={recipe.id}
+              className="bg-white rounded-xl overflow-hidden shadow-md border-l-4 border-[#FFD700] hover:shadow-xl transition-all hover:scale-[1.02]"
+            >
+              {/* Recipe Image */}
+              <div className="w-full h-40 bg-[#eeeeed] overflow-hidden">
+                <img 
+                  src={recipe.image} 
+                  alt={recipe.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&h=400&fit=crop'
+                  }}
+                />
+              </div>
 
-          {suggestions.length > 1 && (
-            <div className="space-y-2">
-              <p className="text-xs font-semibold text-gray-600">More suggestions:</p>
-              {suggestions.slice(1, 3).map((sug: any) => (
-                <div key={sug.id} className="bg-white rounded-lg p-3">
-                  <p className="font-medium text-sm text-gray-900">{sug.suggestion}</p>
-                  <p className="text-xs text-gray-600 mt-1">Missing: {sug.missing}</p>
+              {/* Recipe Info */}
+              <div className="p-4">
+                <h3 className="font-['Epilogue'] text-lg font-semibold text-[#1a1c1c] mb-2">
+                  {recipe.name}
+                </h3>
+                <p className="text-sm text-[#71717a] font-['Plus_Jakarta_Sans'] mb-3">
+                  {recipe.description}
+                </p>
+
+                {/* Recipe Meta */}
+                <div className="flex items-center gap-3 mb-3 flex-wrap">
+                  <span className="flex items-center gap-1 text-xs text-[#3a4a44] font-['Plus_Jakarta_Sans']">
+                    <span className="material-symbols-outlined text-sm">schedule</span>
+                    {recipe.time} min
+                  </span>
+                  <span className={`px-2 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+                    recipe.difficulty === 'easy' ? 'bg-[rgba(0,255,209,0.1)] text-[#006b57]' :
+                    recipe.difficulty === 'medium' ? 'bg-[rgba(255,215,0,0.1)] text-[#ff8a00]' :
+                    'bg-[rgba(255,51,102,0.1)] text-[#ba1a1a]'
+                  }`}>
+                    {recipe.difficulty}
+                  </span>
+                  <span className="flex items-center gap-1 text-xs font-bold neon-text-orange">
+                    <span className="material-symbols-outlined text-sm">shopping_cart</span>
+                    ₹{recipe.gap_cost}
+                  </span>
                 </div>
-              ))}
+
+                {/* Available Ingredients */}
+                <div className="mb-3">
+                  <p className="text-xs font-semibold text-[#006b57] mb-2 font-['Space_Grotesk'] uppercase tracking-wider">
+                    ✓ You Have:
+                  </p>
+                  <div className="flex flex-wrap gap-1">
+                    {recipe.ingredients_available.map((ingredient, idx) => (
+                      <span 
+                        key={idx}
+                        className="text-xs bg-[rgba(0,255,209,0.1)] text-[#006b57] px-2 py-1 rounded-full border border-[rgba(0,255,209,0.3)]"
+                      >
+                        {ingredient}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Missing Ingredients */}
+                <div>
+                  <p className="text-xs font-semibold text-[#ff8a00] mb-2 font-['Space_Grotesk'] uppercase tracking-wider">
+                    Missing:
+                  </p>
+                  <div className="flex flex-wrap gap-1">
+                    {recipe.ingredients_needed.map((ingredient, idx) => (
+                      <span 
+                        key={idx}
+                        className="text-xs bg-[rgba(255,138,0,0.1)] text-[#ff8a00] px-2 py-1 rounded-full border border-[rgba(255,138,0,0.3)]"
+                      >
+                        {ingredient}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Action Button */}
+                <button className="w-full mt-4 dark-gradient neon-border-cyan text-white px-4 py-2 rounded-xl font-['Plus_Jakarta_Sans'] font-semibold text-sm transition-all active:scale-95 flex items-center justify-center gap-2">
+                  <span className="material-symbols-outlined text-lg">add_shopping_cart</span>
+                  Add Missing Items
+                </button>
+              </div>
             </div>
-          )}
-        </div>
-      ) : (
-        <div className="text-center py-8">
-          <Lightbulb className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500 text-sm">No suggestions available</p>
-        </div>
-      )}
+          ))
+        )}
+      </div>
+
+      {/* Material Symbols Font */}
+      <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet"
+      />
     </div>
   )
 }

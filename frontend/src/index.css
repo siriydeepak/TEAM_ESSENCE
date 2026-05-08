@@ -1,15 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Epilogue:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@700&family=Dancing+Script:wght@700&family=Great+Vibes&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  line-height: 1.6;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color-scheme: light;
+  color: #1a1c1c;
+  background-color: #f9f9f9;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -18,64 +20,173 @@
   -webkit-text-size-adjust: 100%;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* Darker Cyber-Kitchen Background with Neon Vibes */
+.cyber-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-image: url('/assets/kitchen-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+.cyber-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Darker overlay for neon pop */
+  background: linear-gradient(135deg, 
+    rgba(10, 25, 20, 0.85) 0%, 
+    rgba(15, 30, 25, 0.88) 50%, 
+    rgba(8, 20, 18, 0.90) 100%
+  );
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* Subtle grid pattern overlay */
+.cyber-bg::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.08;
+  background-image: 
+    linear-gradient(rgba(0, 255, 209, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 209, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Dark Gradient for Buttons */
+.dark-gradient {
+  background: linear-gradient(180deg, #121414 0%, #1E2222 100%);
+}
+
+/* Vibrant Neon Borders */
+.neon-border-cyan {
+  border: 2px solid #00FFD1;
+  box-shadow: 0 0 20px rgba(0, 255, 209, 0.6), 0 0 40px rgba(0, 255, 209, 0.3);
+}
+
+.neon-border-orange {
+  border: 2px solid #FF8A00;
+  box-shadow: 0 0 20px rgba(255, 138, 0, 0.6), 0 0 40px rgba(255, 138, 0, 0.3);
+}
+
+.neon-border-pink {
+  border: 2px solid #FF00E5;
+  box-shadow: 0 0 20px rgba(255, 0, 229, 0.6), 0 0 40px rgba(255, 0, 229, 0.3);
+}
+
+.neon-border-yellow {
+  border: 2px solid #FFD700;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 0 40px rgba(255, 215, 0, 0.3);
+}
+
+/* Card Styles - With neon glow */
+.glass-card {
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0px 20px 25px -5px rgba(0, 0, 0, 0.3), 0px 8px 10px -6px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.hard-shadow {
+  box-shadow: 0px 20px 25px -5px rgba(0, 0, 0, 0.3), 0px 8px 10px -6px rgba(0, 0, 0, 0.2);
+}
+
+/* Vibrant Status Stripe Colors - Top border with glow */
+.stripe-urgent {
+  border-top: 4px solid #FF00E5;
+  box-shadow: 0 -2px 20px rgba(255, 0, 229, 0.4);
+}
+
+.stripe-warning {
+  border-top: 4px solid #FFD700;
+  box-shadow: 0 -2px 20px rgba(255, 215, 0, 0.4);
+}
+
+.stripe-stable {
+  border-top: 4px solid #00FFD1;
+  box-shadow: 0 -2px 20px rgba(0, 255, 209, 0.4);
+}
+
+.stripe-danger {
+  border-top: 4px solid #FF3366;
+  box-shadow: 0 -2px 20px rgba(255, 51, 102, 0.4);
+}
+
+/* Neon text glow */
+.neon-text-cyan {
+  color: #00FFD1;
+  text-shadow: 0 0 10px rgba(0, 255, 209, 0.8), 0 0 20px rgba(0, 255, 209, 0.4);
+}
+
+.neon-text-pink {
+  color: #FF00E5;
+  text-shadow: 0 0 10px rgba(255, 0, 229, 0.8), 0 0 20px rgba(255, 0, 229, 0.4);
+}
+
+.neon-text-yellow {
+  color: #FFD700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.4);
+}
+
+.neon-text-orange {
+  color: #FF8A00;
+  text-shadow: 0 0 10px rgba(255, 138, 0, 0.8), 0 0 20px rgba(255, 138, 0, 0.4);
 }
 
 /* Custom utility classes */
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+  
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@layer components {
+  /* Primary Action Button */
+  .btn-primary {
+    @apply dark-gradient neon-border-cyan font-label-caps text-label-caps uppercase tracking-widest px-6 py-3 rounded-xl transition-all active:scale-95 duration-200;
+    color: #00FFD1;
+  }
+  
+  /* Secondary Action Button */
+  .btn-secondary {
+    @apply dark-gradient neon-border-orange font-label-caps text-label-caps uppercase tracking-widest px-6 py-3 rounded-xl transition-all active:scale-95 duration-200;
+    color: #FF8A00;
+  }
+  
+  /* Dashboard Card - With backdrop blur */
+  .dashboard-card {
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 1.5rem;
+    padding: 24px;
+    box-shadow: 0px 20px 25px -5px rgba(0, 0, 0, 0.3), 0px 8px 10px -6px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(12px);
   }
 }
 
@@ -85,9 +196,10 @@ button:focus-visible {
   bottom: 20px;
   left: 20px;
   right: 20px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  border-radius: 1.5rem;
+  box-shadow: 0px 20px 25px -5px rgba(0, 0, 0, 0.3), 0px 8px 10px -6px rgba(0, 0, 0, 0.2);
   padding: 16px;
   z-index: 1000;
 }
