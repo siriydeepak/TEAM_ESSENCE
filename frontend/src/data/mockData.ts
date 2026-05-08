@@ -25,6 +25,8 @@ export interface Recipe {
   ingredients_needed: string[]
   gap_cost: number
   description: string
+  recipe_url: string
+  source: string
 }
 
 // Mock Products with realistic data
@@ -210,7 +212,9 @@ export const mockRecipes: Recipe[] = [
     ingredients_available: ['Strawberries', 'Greek Yogurt', 'Blueberries'],
     ingredients_needed: ['Granola', 'Honey'],
     gap_cost: 85,
-    description: 'A refreshing breakfast bowl perfect for using up expiring berries'
+    description: 'A refreshing breakfast bowl perfect for using up expiring berries',
+    recipe_url: 'https://www.allrecipes.com/recipe/238491/strawberry-smoothie-bowl/',
+    source: 'AllRecipes'
   },
   {
     id: 'r2',
@@ -221,7 +225,9 @@ export const mockRecipes: Recipe[] = [
     ingredients_available: ['Tomatoes', 'Avocados'],
     ingredients_needed: ['Mozzarella', 'Basil', 'Balsamic'],
     gap_cost: 120,
-    description: 'Fresh Italian salad using your ripe tomatoes and avocados'
+    description: 'Fresh Italian salad using your ripe tomatoes and avocados',
+    recipe_url: 'https://www.foodnetwork.com/recipes/ree-drummond/caprese-salad-recipe-1916250',
+    source: 'Food Network'
   },
   {
     id: 'r3',
@@ -232,7 +238,9 @@ export const mockRecipes: Recipe[] = [
     ingredients_available: ['Eggs', 'Spinach', 'Cheddar Cheese'],
     ingredients_needed: ['Butter', 'Salt', 'Pepper'],
     gap_cost: 45,
-    description: 'Protein-packed breakfast using fresh eggs and greens'
+    description: 'Protein-packed breakfast using fresh eggs and greens',
+    recipe_url: 'https://www.bbcgoodfood.com/recipes/spinach-omelette',
+    source: 'BBC Good Food'
   },
   {
     id: 'r4',
@@ -243,7 +251,9 @@ export const mockRecipes: Recipe[] = [
     ingredients_available: ['Chicken Breast', 'Bell Peppers', 'Spinach'],
     ingredients_needed: ['Soy Sauce', 'Garlic', 'Ginger', 'Rice'],
     gap_cost: 95,
-    description: 'Quick stir-fry to use up chicken before it expires'
+    description: 'Quick stir-fry to use up chicken before it expires',
+    recipe_url: 'https://www.delish.com/cooking/recipe-ideas/a26556220/chicken-stir-fry-recipe/',
+    source: 'Delish'
   },
   {
     id: 'r5',
@@ -254,7 +264,9 @@ export const mockRecipes: Recipe[] = [
     ingredients_available: ['Sourdough Bread', 'Avocados', 'Eggs'],
     ingredients_needed: ['Chili Flakes', 'Lemon'],
     gap_cost: 35,
-    description: 'Classic brunch favorite with perfectly ripe avocados'
+    description: 'Classic brunch favorite with perfectly ripe avocados',
+    recipe_url: 'https://www.loveandlemons.com/avocado-toast/',
+    source: 'Love and Lemons'
   },
   {
     id: 'r6',
@@ -265,7 +277,9 @@ export const mockRecipes: Recipe[] = [
     ingredients_available: ['Greek Yogurt', 'Strawberries', 'Blueberries'],
     ingredients_needed: ['Granola', 'Honey', 'Nuts'],
     gap_cost: 75,
-    description: 'Healthy parfait using expiring dairy and berries'
+    description: 'Healthy parfait using expiring dairy and berries',
+    recipe_url: 'https://www.eatingwell.com/recipe/249879/berry-yogurt-parfait/',
+    source: 'Eating Well'
   }
 ]
 
@@ -307,6 +321,192 @@ export const mockAnalytics = {
     { name: 'Bakery', value: 1, color: '#FF00E5' },
     { name: 'Other', value: 1, color: '#A1A1AA' }
   ]
+}
+
+// Expired Product Utilization Guides
+export interface UtilizationGuide {
+  id: string
+  product_type: string
+  category: string
+  title: string
+  description: string
+  image: string
+  guide_url: string
+  source: string
+  difficulty: 'easy' | 'medium' | 'hard'
+  time_required: string
+}
+
+export const utilizationGuides: UtilizationGuide[] = [
+  {
+    id: 'u1',
+    product_type: 'Milk',
+    category: 'Dairy',
+    title: 'Turn Expired Milk into Paneer',
+    description: 'Transform sour milk into fresh homemade paneer (Indian cottage cheese) in just 30 minutes',
+    image: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=600&h=400&fit=crop',
+    guide_url: 'https://www.indianhealthyrecipes.com/paneer-recipe-homemade-paneer/',
+    source: 'Indian Healthy Recipes',
+    difficulty: 'easy',
+    time_required: '30 minutes'
+  },
+  {
+    id: 'u2',
+    product_type: 'Milk',
+    category: 'Dairy',
+    title: 'Make Homemade Yogurt from Milk',
+    description: 'Convert milk into probiotic-rich yogurt with this simple fermentation method',
+    image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=600&h=400&fit=crop',
+    guide_url: 'https://www.thekitchn.com/how-to-make-yogurt-at-home-cooking-lessons-from-the-kitchn-125070',
+    source: 'The Kitchn',
+    difficulty: 'easy',
+    time_required: '8-12 hours'
+  },
+  {
+    id: 'u3',
+    product_type: 'Milk',
+    category: 'Dairy',
+    title: 'Homemade Butter from Cream',
+    description: 'Churn expired cream or milk into fresh butter and buttermilk',
+    image: 'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=600&h=400&fit=crop',
+    guide_url: 'https://www.theprairiehomestead.com/2011/04/how-to-make-butter.html',
+    source: 'The Prairie Homestead',
+    difficulty: 'easy',
+    time_required: '15 minutes'
+  },
+  {
+    id: 'u4',
+    product_type: 'Milk',
+    category: 'Dairy',
+    title: 'Ricotta Cheese from Sour Milk',
+    description: 'Create creamy ricotta cheese from milk that has gone sour',
+    image: 'https://images.unsplash.com/photo-1452195100486-9cc805987862?w=600&h=400&fit=crop',
+    guide_url: 'https://www.seriouseats.com/how-to-make-fresh-ricotta-cheese',
+    source: 'Serious Eats',
+    difficulty: 'medium',
+    time_required: '45 minutes'
+  },
+  {
+    id: 'u5',
+    product_type: 'Vegetable Peels',
+    category: 'Produce',
+    title: 'Compost from Kitchen Scraps',
+    description: 'Turn vegetable peels and scraps into nutrient-rich compost for your garden',
+    image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&h=400&fit=crop',
+    guide_url: 'https://www.epa.gov/recycle/composting-home',
+    source: 'EPA',
+    difficulty: 'easy',
+    time_required: '2-3 months'
+  },
+  {
+    id: 'u6',
+    product_type: 'Vegetable Peels',
+    category: 'Produce',
+    title: 'Vegetable Stock from Scraps',
+    description: 'Make flavorful vegetable stock from peels, stems, and leftover vegetables',
+    image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&h=400&fit=crop',
+    guide_url: 'https://www.thekitchn.com/how-to-make-vegetable-stock-cooking-lessons-from-the-kitchn-93916',
+    source: 'The Kitchn',
+    difficulty: 'easy',
+    time_required: '1-2 hours'
+  },
+  {
+    id: 'u7',
+    product_type: 'Bread',
+    category: 'Bakery',
+    title: 'Breadcrumbs from Stale Bread',
+    description: 'Transform stale bread into crispy breadcrumbs for coating and toppings',
+    image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&h=400&fit=crop',
+    guide_url: 'https://www.simplyrecipes.com/recipes/how_to_make_bread_crumbs/',
+    source: 'Simply Recipes',
+    difficulty: 'easy',
+    time_required: '20 minutes'
+  },
+  {
+    id: 'u8',
+    product_type: 'Bread',
+    category: 'Bakery',
+    title: 'Bread Pudding from Old Bread',
+    description: 'Create a delicious dessert from stale or expired bread',
+    image: 'https://images.unsplash.com/photo-1586444248902-2f64eddc13df?w=600&h=400&fit=crop',
+    guide_url: 'https://www.allrecipes.com/recipe/7177/bread-pudding/',
+    source: 'AllRecipes',
+    difficulty: 'easy',
+    time_required: '1 hour'
+  },
+  {
+    id: 'u9',
+    product_type: 'Bananas',
+    category: 'Produce',
+    title: 'Banana Bread from Overripe Bananas',
+    description: 'Use brown, overripe bananas to make moist and delicious banana bread',
+    image: 'https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?w=600&h=400&fit=crop',
+    guide_url: 'https://www.simplyrecipes.com/recipes/banana_bread/',
+    source: 'Simply Recipes',
+    difficulty: 'easy',
+    time_required: '1 hour 15 minutes'
+  },
+  {
+    id: 'u10',
+    product_type: 'Tomatoes',
+    category: 'Produce',
+    title: 'Tomato Sauce from Soft Tomatoes',
+    description: 'Cook down soft, overripe tomatoes into rich pasta sauce',
+    image: 'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?w=600&h=400&fit=crop',
+    guide_url: 'https://www.bonappetit.com/recipe/simple-tomato-sauce',
+    source: 'Bon Appétit',
+    difficulty: 'easy',
+    time_required: '45 minutes'
+  },
+  {
+    id: 'u11',
+    product_type: 'Citrus Peels',
+    category: 'Produce',
+    title: 'Natural Cleaner from Citrus Peels',
+    description: 'Make eco-friendly all-purpose cleaner from orange and lemon peels',
+    image: 'https://images.unsplash.com/photo-1600948836101-f9ffda59d250?w=600&h=400&fit=crop',
+    guide_url: 'https://www.treehugger.com/how-to-make-citrus-vinegar-cleaner-4858556',
+    source: 'TreeHugger',
+    difficulty: 'easy',
+    time_required: '2 weeks (steeping)'
+  },
+  {
+    id: 'u12',
+    product_type: 'Coffee Grounds',
+    category: 'Other',
+    title: 'Garden Fertilizer from Coffee Grounds',
+    description: 'Use spent coffee grounds as nitrogen-rich fertilizer for plants',
+    image: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=600&h=400&fit=crop',
+    guide_url: 'https://www.gardeningknowhow.com/composting/ingredients/coffee-grounds-gardening.htm',
+    source: 'Gardening Know How',
+    difficulty: 'easy',
+    time_required: '5 minutes'
+  }
+]
+
+// Get utilization guides by product name
+export const getUtilizationGuides = (productName: string): UtilizationGuide[] => {
+  const productLower = productName.toLowerCase()
+  
+  // Map product names to guide types
+  if (productLower.includes('milk')) {
+    return utilizationGuides.filter(g => g.product_type === 'Milk')
+  } else if (productLower.includes('bread')) {
+    return utilizationGuides.filter(g => g.product_type === 'Bread')
+  } else if (productLower.includes('banana')) {
+    return utilizationGuides.filter(g => g.product_type === 'Bananas')
+  } else if (productLower.includes('tomato')) {
+    return utilizationGuides.filter(g => g.product_type === 'Tomatoes')
+  } else if (productLower.includes('peel') || productLower.includes('vegetable') || productLower.includes('produce')) {
+    return utilizationGuides.filter(g => g.product_type === 'Vegetable Peels')
+  } else if (productLower.includes('citrus') || productLower.includes('orange') || productLower.includes('lemon')) {
+    return utilizationGuides.filter(g => g.product_type === 'Citrus Peels')
+  } else if (productLower.includes('coffee')) {
+    return utilizationGuides.filter(g => g.product_type === 'Coffee Grounds')
+  }
+  
+  // Return general composting guide for other produce
+  return utilizationGuides.filter(g => g.product_type === 'Vegetable Peels')
 }
 
 // Get products by status
