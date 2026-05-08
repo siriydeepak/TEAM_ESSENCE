@@ -1,3 +1,5 @@
+import UtilizationGuides from './UtilizationGuides'
+
 interface InventoryItem {
   id: string
   name: string
@@ -89,77 +91,85 @@ export default function InventoryList({ items, loading }: InventoryListProps) {
             </p>
           </div>
         ) : (
-          items.map((item) => (
-            <div 
-              key={item.id} 
-              className={`bg-white rounded-2xl p-6 flex items-center gap-6 shadow-[0px_20px_25px_-5px_rgba(0,0,0,0.1),0px_8px_10px_-6px_rgba(0,0,0,0.1)] ${getStatusColor(item.status)} relative overflow-hidden group transition-transform hover:scale-[1.01]`}
-            >
-              {/* Product Image */}
-              <div className="w-16 h-16 rounded-lg bg-[#eeeeed] overflow-hidden shrink-0">
-                {item.image ? (
-                  <img 
-                    src={item.image} 
-                    alt={item.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      // Fallback to icon if image fails to load
-                      e.currentTarget.style.display = 'none'
-                      e.currentTarget.nextElementSibling?.classList.remove('hidden')
-                    }}
-                  />
-                ) : null}
-                <div className={`w-full h-full flex items-center justify-center ${item.image ? 'hidden' : ''}`}>
-                  <span className="material-symbols-outlined text-4xl text-[#a1a1aa]">
-                    {item.category === 'Dairy' ? 'egg' : 
-                     item.category === 'Produce' ? 'nutrition' : 
-                     item.category === 'Meat' ? 'restaurant' :
-                     item.category === 'Bakery' ? 'bakery_dining' :
-                     'grocery'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="flex-grow">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h4 className="font-['Epilogue'] text-xl font-normal text-[#1a1c1c]">{item.name}</h4>
-                    <p className="text-xs text-[#71717a] font-['Plus_Jakarta_Sans'] mt-1">
-                      {item.quantity} {item.unit} • {item.category}
-                    </p>
+          items.map((item) => {
+            const isExpired = item.days_left < 0
+            return (
+              <div 
+                key={item.id} 
+                className={`bg-white rounded-2xl p-6 shadow-[0px_20px_25px_-5px_rgba(0,0,0,0.1),0px_8px_10px_-6px_rgba(0,0,0,0.1)] ${getStatusColor(item.status)} relative overflow-hidden group transition-transform hover:scale-[1.01]`}
+              >
+                <div className="flex items-center gap-6">
+                  {/* Product Image */}
+                  <div className="w-16 h-16 rounded-lg bg-[#eeeeed] overflow-hidden shrink-0">
+                    {item.image ? (
+                      <img 
+                        src={item.image} 
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          // Fallback to icon if image fails to load
+                          e.currentTarget.style.display = 'none'
+                          e.currentTarget.nextElementSibling?.classList.remove('hidden')
+                        }}
+                      />
+                    ) : null}
+                    <div className={`w-full h-full flex items-center justify-center ${item.image ? 'hidden' : ''}`}>
+                      <span className="material-symbols-outlined text-4xl text-[#a1a1aa]">
+                        {item.category === 'Dairy' ? 'egg' : 
+                         item.category === 'Produce' ? 'nutrition' : 
+                         item.category === 'Meat' ? 'restaurant' :
+                         item.category === 'Bakery' ? 'bakery_dining' :
+                         'grocery'}
+                      </span>
+                    </div>
                   </div>
-                  <span className={`px-2 py-1 rounded-full text-[10px] font-['Plus_Jakarta_Sans'] font-bold uppercase tracking-wider ${getStatusBadge(item.status)}`}>
-                    {item.status}
-                  </span>
-                </div>
 
-                {/* Progress Bar */}
-                <div className="flex items-center gap-4 mb-2">
-                  <div className="flex-grow h-2 bg-[#eeeeed] rounded-full overflow-hidden">
-                    <div 
-                      className={`h-full ${getProgressColor(item.status)}`}
-                      style={{ width: `${Math.max(0, Math.min(100, (item.days_left / 7) * 100))}%` }}
-                    ></div>
+                  {/* Content */}
+                  <div className="flex-grow">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h4 className="font-['Epilogue'] text-xl font-normal text-[#1a1c1c]">{item.name}</h4>
+                        <p className="text-xs text-[#71717a] font-['Plus_Jakarta_Sans'] mt-1">
+                          {item.quantity} {item.unit} • {item.category}
+                        </p>
+                      </div>
+                      <span className={`px-2 py-1 rounded-full text-[10px] font-['Plus_Jakarta_Sans'] font-bold uppercase tracking-wider ${getStatusBadge(item.status)}`}>
+                        {isExpired ? 'EXPIRED' : item.status}
+                      </span>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="flex items-center gap-4 mb-2">
+                      <div className="flex-grow h-2 bg-[#eeeeed] rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full ${getProgressColor(item.status)}`}
+                          style={{ width: `${Math.max(0, Math.min(100, (item.days_left / 7) * 100))}%` }}
+                        ></div>
+                      </div>
+                      <span className={`font-['Space_Grotesk'] text-[10px] font-normal shrink-0 ${
+                        item.days_left < 0 ? 'text-[#ba1a1a]' :
+                        item.days_left <= 2 ? 'text-[#ff8a00]' :
+                        'text-[#006b57]'
+                      }`}>
+                        {item.days_left < 0 
+                          ? `Expired ${Math.abs(item.days_left)}d ago`
+                          : `${item.days_left} Days Left`
+                        }
+                      </span>
+                    </div>
                   </div>
-                  <span className={`font-['Space_Grotesk'] text-[10px] font-normal shrink-0 ${
-                    item.days_left < 0 ? 'text-[#ba1a1a]' :
-                    item.days_left <= 2 ? 'text-[#ff8a00]' :
-                    'text-[#006b57]'
-                  }`}>
-                    {item.days_left < 0 
-                      ? `Expired ${Math.abs(item.days_left)}d ago`
-                      : `${item.days_left} Days Left`
-                    }
-                  </span>
-                </div>
-              </div>
 
-              {/* More Button */}
-              <button className="material-symbols-outlined text-[#a1a1aa] hover:text-primary transition-colors">
-                more_vert
-              </button>
-            </div>
-          ))
+                  {/* More Button */}
+                  <button className="material-symbols-outlined text-[#a1a1aa] hover:text-primary transition-colors">
+                    more_vert
+                  </button>
+                </div>
+
+                {/* Utilization Guides for Expired Items */}
+                <UtilizationGuides productName={item.name} isExpired={isExpired} />
+              </div>
+            )
+          })
         )}
       </div>
 
