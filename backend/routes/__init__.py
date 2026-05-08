@@ -1,5 +1,4 @@
 # Backend routes module
-
 from .inventory import router as inventory_router
 from .weather import router as weather_router
 from .analytics import router as analytics_router
@@ -8,7 +7,8 @@ from .smart_cart import router as smart_cart_router
 from .gap_finder import router as gap_finder_router
 from .auth import router as auth_router
 from .automation import router as automation_router
-
+from .telegram import router as telegram_router
+from .virtual_kitchen import router as virtual_kitchen_router
 __all__ = [
     "inventory_router",
     "weather_router", 
@@ -18,4 +18,7 @@ __all__ = [
     "gap_finder_router",
     "auth_router",
     "automation_router"
+    "automation_router",
+    "telegram_router",
+    "virtual_kitchen_router",
 ]

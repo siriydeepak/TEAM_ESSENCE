@@ -25,6 +25,7 @@
     "install:all": "npm install",
     "postinstall": "npm run setup:env",
     "setup:env": "node scripts/setup-env.js",
+    "setup:webhook": "node scripts/setup-webhook.js",
     "vercel:build": "npm run build",
     "vercel:dev": "npm run dev"
   },
