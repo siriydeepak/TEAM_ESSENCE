@@ -1,0 +1,161 @@
+{
+  "version": 2,
+  "name": "team-essence-monorepo",
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "frontend/dist",
+        "framework": "vite"
+      }
+    },
+    {
+      "src": "backend/main.py",
+      "use": "@vercel/python",
+      "config": {
+        "runtime": "python3.9"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/backend/main.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/dist/$1"
+    }
+  ],
+  "env": {
+    "DATABASE_URL": "@database_url",
+    "OWM_API_KEY": "@owm_api_key",
+    "NEXTAUTH_SECRET": "@nextauth_secret",
+    "NEXTAUTH_URL": "@nextauth_url",
+    "GOOGLE_CLIENT_ID": "@google_client_id",
+    "GOOGLE_CLIENT_SECRET": "@google_client_secret",
+    "JWT_SECRET": "@jwt_secret",
+    "SESSION_SECRET": "@session_secret",
+    "CORS_ORIGINS": "@cors_origins",
+    "FRONTEND_URL": "@frontend_url",
+    "ENVIRONMENT": "production",
+    "NODE_ENV": "production",
+    "PYTHON_VERSION": "3.9",
+    "FASTAPI_ENV": "production",
+    "LOG_LEVEL": "info",
+    "ENABLE_WEATHER_INTEGRATION": "@enable_weather_integration",
+    "ENABLE_RECEIPT_PARSING": "@enable_receipt_parsing",
+    "ENABLE_SMART_SHOPPING": "@enable_smart_shopping",
+    "ENABLE_ANALYTICS": "@enable_analytics",
+    "ENABLE_PUSH_NOTIFICATIONS": "@enable_push_notifications",
+    "SENTRY_DSN": "@sentry_dsn",
+    "EMAIL_SERVICE_API_KEY": "@email_service_api_key",
+    "VAPID_PUBLIC_KEY": "@vapid_public_key",
+    "VAPID_PRIVATE_KEY": "@vapid_private_key"
+  },
+  "build": {
+    "env": {
+      "VITE_API_URL": "https://$VERCEL_URL/api",
+      "VITE_APP_VERSION": "2.0.0",
+      "VITE_ENABLE_ANALYTICS": "@vite_enable_analytics",
+      "VITE_ENABLE_PWA": "@vite_enable_pwa",
+      "VITE_ENABLE_NOTIFICATIONS": "@vite_enable_notifications",
+      "VITE_PWA_NAME": "AetherShelf - Smart Inventory Management",
+      "VITE_PWA_SHORT_NAME": "AetherShelf",
+      "VITE_PWA_THEME_COLOR": "#2563eb",
+      "VITE_PWA_BACKGROUND_COLOR": "#ffffff"
+    }
+  },
+  "functions": {
+    "backend/main.py": {
+      "runtime": "python3.9",
+      "maxDuration": 30,
+      "memory": 1024,
+      "regions": ["iad1"]
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://$VERCEL_URL"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization, X-Requested-With, Accept, Origin, Cache-Control, X-File-Name"
+        },
+        {
+          "key": "Access-Control-Allow-Credentials",
+          "value": "true"
+        },
+        {
+          "key": "Access-Control-Max-Age",
+          "value": "86400"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
+      ]
+    },
+    {
+      "source": "/static/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/backend/main.py"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/docs",
+      "destination": "/api/docs",
+      "permanent": false
+    }
+  ],
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "buildCommand": "cd frontend && npm run build",
+  "installCommand": "npm install && cd frontend && npm install",
+  "outputDirectory": "frontend/dist"
+}
